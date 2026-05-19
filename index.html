@@ -1,193 +1,628 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fiestas que cuentan historias</title>
-   
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-   
-    <!-- React & ReactDOM -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    <!-- Babel for in-browser JSX compilation -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <style>
-        /* Base typography overrides to match the design */
-        .font-sans { font-family: 'Inter', sans-serif; }
-        .font-serif { font-family: 'Merriweather', serif; }
-
-        /* Print specifics */
-        @media print {
-            body { background: white !important; color: black !important; }
-            .print\:hidden { display: none !important; }
-            .page-break-after-always { page-break-after: always !important; }
-            * {
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¡Hola! Learning Spanish Greetings</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts for Friendly Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <!-- Confetti Canvas for celebration -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <style>
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background-color: #f0fdf4; /* Light green/teal pastel background */
+    }
+    h1, h2, h3, .font-kids {
+      font-family: 'Fredoka', sans-serif;
+    }
+    .card-bounce:hover {
+      transform: translateY(-5px) scale(1.02);
+    }
+    /* Simple custom switch styling */
+    .toggle-checkbox:checked + .toggle-label {
+      background-color: #10b981;
+    }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans antialiased">
-    <div id="root"></div>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between">
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
+  <!-- Header Section -->
+  <header class="bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 text-white py-6 shadow-lg relative overflow-hidden">
+    <!-- Decorative clouds / shapes -->
+    <div class="absolute -top-10 -left-10 w-32 h-32 bg-white opacity-20 rounded-full"></div>
+    <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-white opacity-20 rounded-full"></div>
+    
+    <div class="container mx-auto px-4 text-center relative z-10">
+      <span class="inline-block bg-white text-orange-600 font-bold px-4 py-1.5 rounded-full text-sm mb-2 shadow-sm uppercase tracking-wider">¡Amigos! Grade 3 Spanish</span>
+      <h1 class="text-4xl md:text-5xl font-bold tracking-wide drop-shadow-md">¡Hola, Amigos! 👋</h1>
+      <p class="text-lg md:text-xl mt-2 font-medium opacity-90">Let's learn how to say hello, ask "how are you?", and say goodbye in Spanish!</p>
+    </div>
+  </header>
 
-        // SVG equivalents of the lucide-react icons used in the app
-        const Icon = ({ children, size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                {children}
-            </svg>
-        );
+  <!-- Interactive Content Container -->
+  <main class="container mx-auto px-4 py-8 max-w-5xl flex-grow space-y-12">
 
-        const BookOpen = (p) => <Icon {...p}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></Icon>;
-        const MapPin = (p) => <Icon {...p}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></Icon>;
-        const Calendar = (p) => <Icon {...p}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></Icon>;
-        const Info = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></Icon>;
-        const Edit3 = (p) => <Icon {...p}><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></Icon>;
-        const ArrowRight = (p) => <Icon {...p}><line x1="5" x2="19" y1="12" y2="12"/><polyline points="12 5 19 12 12 19"/></Icon>;
-        const ArrowLeft = (p) => <Icon {...p}><line x1="19" x2="5" y1="12" y2="12"/><polyline points="12 19 5 12 12 5"/></Icon>;
-        const List = (p) => <Icon {...p}><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></Icon>;
-        const Globe = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></Icon>;
-        const ChevronRight = (p) => <Icon {...p}><polyline points="9 18 15 12 9 6"/></Icon>;
-        const CheckCircle2 = (p) => <Icon {...p}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></Icon>;
-        const Printer = (p) => <Icon {...p}><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></Icon>;
-        const ExternalLink = (p) => <Icon {...p}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></Icon>;
-        const PlayCircle = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></Icon>;
-        const TrendingUp = (p) => <Icon {...p}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></Icon>;
-        const Camera = (p) => <Icon {...p}><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></Icon>;
-        const ImageIcon = (p) => <Icon {...p}><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></Icon>;
-        function App() {
-          const [appData, setAppData] = useState(initialBookData);
-          const [isEditMode, setIsEditMode] = useState(false);
-          const [editModal, setEditModal] = useState({ isOpen: false, chapterId: null, type: '', index: 0, currentUrl: '', tempUrl: '' });
-          const [previewError, setPreviewError] = useState(false);
-          const [currentView, setCurrentView] = useState('cover'); // 'cover', 'toc', 'chapter', 'print'
-          const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
-          const [activeTab, setActiveTab] = useState('story'); // 'story', 'culture', 'activities'
-         
-          // State to store student answers
-          const [studentAnswers, setStudentAnswers] = useState({});
+    <!-- Interactive Soundboard Intro -->
+    <section class="bg-white rounded-3xl p-6 md:p-8 shadow-md border-4 border-yellow-200">
+      <div class="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
+        <div>
+          <h2 class="text-2xl md:text-3xl font-bold text-orange-500 flex items-center gap-2">
+            <span>🗣️</span> Spanish Soundboard
+          </h2>
+          <p class="text-slate-600 mt-1">Click a card to hear it spoken in Spanish! Toggle the translation to see what it means.</p>
+        </div>
+        
+        <!-- Global Translation Toggle -->
+        <div class="flex items-center gap-3 bg-slate-100 px-4 py-2.5 rounded-full">
+          <span class="text-sm font-semibold text-slate-700">Show English translations:</span>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="translationToggle" class="sr-only peer" onchange="toggleAllTranslations(this.checked)">
+            <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+          </label>
+        </div>
+      </div>
 
-          const handleAnswerChange = (chapterId, questionIndex, value) => {
-            setStudentAnswers(prev => ({
-              ...prev,
-              [chapterId]: {
-                ...(prev[chapterId] || {}),
-                [questionIndex]: value
-              }
-            }));
-          };
+      <!-- Flashcard Grid -->
+      <div id="flashcards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Cards will be dynamically injected here for clean handling and speech integration -->
+      </div>
+    </section>
 
-          const goToChapter = (index) => {
-            setCurrentChapterIndex(index);
-            setActiveTab('story');
-            setCurrentView('chapter');
-            window.scrollTo(0, 0);
-          };
+    <!-- Interactive Game: Conversation Match-up -->
+    <section class="bg-white rounded-3xl p-6 md:p-8 shadow-md border-4 border-indigo-200">
+      <h2 class="text-2xl md:text-3xl font-bold text-indigo-600 flex items-center gap-2 mb-2">
+        <span>🧩</span> Conversation Builder Game
+      </h2>
+      <p class="text-slate-600 mb-6">These two friends are meeting at school! Put their conversation in the correct order by clicking the speech bubbles below.</p>
 
-          const nextChapter = () => {
-            if (currentChapterIndex < appData.length - 1) {
-              goToChapter(currentChapterIndex + 1);
-            }
-          };
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+        <!-- Character 1 -->
+        <div class="bg-indigo-50 rounded-2xl p-4 flex flex-col items-center justify-center text-center border-2 border-indigo-100">
+          <span class="text-6xl mb-2">👦🏼</span>
+          <span class="font-bold text-indigo-700 text-lg">Mateo</span>
+          <p class="text-xs text-indigo-500 mt-1 italic">Speaks first</p>
+        </div>
 
-          const prevChapter = () => {
-            if (currentChapterIndex > 0) {
-              goToChapter(currentChapterIndex - 1);
-            } else {
-              setCurrentView('toc');
-            }
-          };
+        <!-- The Dialogue Area (Sorted Order to Build) -->
+        <div class="md:col-span-2 flex flex-col gap-3 justify-center min-h-[250px] bg-slate-50 p-4 rounded-2xl border-2 border-dashed border-slate-300">
+          <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 text-center">Your Story Path:</h3>
+          <div id="dialogue-slots" class="space-y-3">
+            <!-- Ordered steps will appear here -->
+          </div>
+          <div id="dialogue-complete-msg" class="hidden text-center py-4 text-emerald-600 font-bold text-xl animate-bounce">
+            🎉 ¡Excelente! You successfully built the perfect Spanish conversation!
+          </div>
+        </div>
+      </div>
 
-          const handleSaveImageUrl = () => {
-            setAppData(prev => prev.map(ch => {
-              if (ch.id === editModal.chapterId) {
-                if (editModal.type === 'cover') {
-                  return { ...ch, image: editModal.tempUrl };
-                } else if (editModal.type === 'gallery') {
-                  const newGallery = [...ch.culture.gallery];
-                  newGallery[editModal.index] = editModal.tempUrl;
-                  return { ...ch, culture: { ...ch.culture, gallery: newGallery } };
-                }
-              }
-              return ch;
-            }));
-            setEditModal({ isOpen: false, chapterId: null, type: '', index: 0, currentUrl: '', tempUrl: '' });
-            setPreviewError(false);
-          };
+      <!-- Choices Pool -->
+      <div class="mt-8 bg-indigo-50/50 p-6 rounded-2xl border-2 border-indigo-100">
+        <h4 class="font-bold text-slate-700 mb-4 text-center">Click the conversation lines below in order, starting from the first greeting to the final goodbye!</h4>
+        <div id="dialogue-choices" class="flex flex-wrap gap-3 justify-center">
+          <!-- Dynamically filled with shuffled dialogue blocks -->
+        </div>
+        <div class="text-center mt-6">
+          <button onclick="resetDialogueGame()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-md transition-all">
+            🔄 Reset Conversation Game
+          </button>
+        </div>
+      </div>
+    </section>
 
-          // Helper para asignar color según nivel de vocabulario
-          const getLevelColor = (level) => {
-            if(level.includes('Inicial')) return 'bg-green-100 text-green-800 border-green-200';
-            if(level.includes('Intermedio')) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-            return 'bg-purple-100 text-purple-800 border-purple-200';
-          };
-                      <h1 className="text-5xl font-extrabold mb-4 uppercase tracking-widest font-sans">Fiestas que cuentan historias</h1>
-                      <p className="text-2xl italic text-slate-700 mb-2">Un viaje cultural por el mundo hispanohablante</p>
-                      <p className="text-xl font-bold border-t-2 border-b-2 border-black inline-block py-2 px-6 mt-4 font-sans">Cuaderno de Comprensión y Reflexión (IB)</p>
-                      <div className="mt-16 flex flex-col items-start w-1/2 mx-auto gap-4 font-sans">
-                        <div className="w-full flex border-b-2 border-black pb-1"><span className="font-bold mr-4">Nombre:</span> </div>
-                        <div className="w-full flex border-b-2 border-black pb-1"><span className="font-bold mr-4">Fecha:</span> </div>
-                      </div>
-                    </div>
+    <!-- Super Greeting Quiz Section -->
+    <section class="bg-white rounded-3xl p-6 md:p-8 shadow-md border-4 border-red-200">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl md:text-3xl font-bold text-rose-500 flex items-center gap-2">
+            <span>🏆</span> Super Greeting Quiz
+          </h2>
+          <p class="text-slate-600">Test your Spanish greeting superpowers!</p>
+        </div>
+        
+        <!-- Score and Progress Bar -->
+        <div class="w-full md:w-auto flex flex-col items-end">
+          <span class="text-lg font-bold text-rose-600" id="quiz-score-badge">Score: 0 / 5</span>
+          <div class="w-full md:w-48 bg-slate-100 rounded-full h-3 mt-1 overflow-hidden">
+            <div id="quiz-progress-bar" class="bg-rose-500 h-full w-0 transition-all duration-300"></div>
+          </div>
+        </div>
+      </div>
 
-                    {appData.map((chapter, index) => (
-                       <div key={chapter.id} className="mb-24 page-break-after-always">
-                         
-                          <div className="border-l-8 border-slate-800 pl-6 mb-8">
-                            <h2 className="text-4xl font-black uppercase font-sans">
-                              {index + 1}. {chapter.title}
-                            </h2>
-                            <h3 className="text-2xl text-slate-600 italic mt-2 flex items-center gap-2">
-                               {chapter.country} • {chapter.vocabLevel}
-                            </h3>
-                          </div>
-                         
-                          <h4 className="text-2xl font-bold mb-4 font-sans bg-slate-100 p-2 inline-block">Lectura: "{chapter.storyTitle}"</h4>
-                          <div className="text-justify leading-loose text-lg mb-8 space-y-4 pr-4">
-                            {chapter.story.map((p, i) => (
-                              <p key={i} className={p.startsWith('—') ? 'pl-8 italic' : ''}>{p}</p>
-                            ))}
-                          </div>
+      <!-- Quiz Window -->
+      <div id="quiz-card" class="bg-rose-50/50 p-6 rounded-2xl border border-rose-100 min-h-[250px] flex flex-col justify-between">
+        <!-- Question Container -->
+        <div id="question-container">
+          <!-- Dynamic Question text and options -->
+        </div>
+      </div>
+      
+      <!-- Custom Success Feedback Banner (replaces alert) -->
+      <div id="custom-alert" class="hidden fixed bottom-6 right-6 left-6 md:left-auto md:w-96 z-50 bg-emerald-600 text-white p-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-slide-up">
+        <span class="text-3xl">🎉</span>
+        <div>
+          <h4 class="font-bold text-lg" id="alert-title">Awesome!</h4>
+          <p class="text-sm" id="alert-msg">You got that right!</p>
+        </div>
+      </div>
+    </section>
 
-                          <h4 className="text-xl font-bold mb-4 border-b-2 border-slate-300 pb-2 font-sans">Vocabulario Bilingüe Escalonado</h4>
-                          <div className="grid grid-cols-2 gap-x-8 gap-y-3 mb-10 text-lg bg-slate-50 p-6 border border-slate-200">
-                            {chapter.keywords.map((kw, i) => (
-                              <div key={i} className="flex border-b border-slate-300 border-dotted pb-1 font-sans">
-                                <span className="font-bold w-1/2">{kw.word}</span>
-                                <span className="italic text-slate-600 w-1/2">{kw.translation}</span>
-                              </div>
-                            ))}
-                          </div>
+  </main>
 
-                          <h4 className="text-2xl font-bold mb-6 font-sans bg-slate-100 p-2 inline-block">Actividades de Reflexión (IB)</h4>
-                          <div className="space-y-12">
-                             {chapter.activities.map((act, i) => (
-                                <div key={i} className="mb-12 font-sans">
-                                  <p className="font-bold text-lg mb-6 leading-relaxed">{i + 1}. {act}</p>
-                                  <div className="border-b-2 border-slate-400 mt-10"></div>
-                                  <div className="border-b-2 border-slate-400 mt-10"></div>
-                                  <div className="border-b-2 border-slate-400 mt-10"></div>
-                                  <div className="border-b-2 border-slate-400 mt-10"></div>
-                                </div>
-                             ))}
-                          </div>
-                       </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-           );
+  <!-- Friendly Footer -->
+  <footer class="bg-slate-800 text-slate-300 py-6 text-center text-sm">
+    <div class="container mx-auto px-4">
+      <p class="font-medium text-slate-400">👋 ¡Adiós! Keep practicing your Spanish greetings!</p>
+      <p class="mt-2 text-xs text-slate-500">Designed with ❤️ for Elementary School Grade 3 Learners. Powered by modern web browser Voice Engines.</p>
+    </div>
+  </footer>
+
+  <!-- Script for interactivity -->
+  <script>
+    // --- DATA ---
+    const greetingsData = [
+      {
+        id: "hola",
+        spanish: "¡Hola!",
+        english: "Hello!",
+        hint: "Say it when you first see your friend!",
+        emoji: "👋",
+        color: "bg-yellow-100 border-yellow-300 text-yellow-950",
+        iconColor: "text-yellow-500"
+      },
+      {
+        id: "buenos-dias",
+        spanish: "¡Buenos días!",
+        english: "Good morning!",
+        hint: "When the sun first comes up!",
+        emoji: "🌅",
+        color: "bg-amber-100 border-amber-300 text-amber-950",
+        iconColor: "text-amber-500"
+      },
+      {
+        id: "buenas-tardes",
+        spanish: "¡Buenas tardes!",
+        english: "Good afternoon!",
+        hint: "After lunch, when you are at school!",
+        emoji: "☀️",
+        color: "bg-orange-100 border-orange-300 text-orange-950",
+        iconColor: "text-orange-500"
+      },
+      {
+        id: "buenas-noches",
+        spanish: "¡Buenas noches!",
+        english: "Good night!",
+        hint: "Time to sleep and dream!",
+        emoji: "🌙",
+        color: "bg-indigo-100 border-indigo-300 text-indigo-950",
+        iconColor: "text-indigo-500"
+      },
+      {
+        id: "como-estas",
+        spanish: "¿Cómo estás?",
+        english: "How are you?",
+        hint: "Ask how your friend is feeling!",
+        emoji: "🤔",
+        color: "bg-purple-100 border-purple-300 text-purple-950",
+        iconColor: "text-purple-500"
+      },
+      {
+        id: "bien-gracias",
+        spanish: "Bien, gracias.",
+        english: "Good, thank you.",
+        hint: "The perfect answer to how you are feeling!",
+        emoji: "😊",
+        color: "bg-emerald-100 border-emerald-300 text-emerald-950",
+        iconColor: "text-emerald-500"
+      },
+      {
+        id: "como-te-llamas",
+        spanish: "¿Cómo te llamas?",
+        english: "What is your name?",
+        hint: "Ask a new friend's name!",
+        emoji: "📛",
+        color: "bg-teal-100 border-teal-300 text-teal-950",
+        iconColor: "text-teal-500"
+      },
+      {
+        id: "me-llamo",
+        spanish: "Me llamo...",
+        english: "My name is...",
+        hint: "Tell your new friend your name!",
+        emoji: "✏️",
+        color: "bg-blue-100 border-blue-300 text-blue-950",
+        iconColor: "text-blue-500"
+      },
+      {
+        id: "adios",
+        spanish: "¡Adiós!",
+        english: "Goodbye!",
+        hint: "Say it when you are leaving school!",
+        emoji: "🙋‍♂️",
+        color: "bg-rose-100 border-rose-300 text-rose-950",
+        iconColor: "text-rose-500"
+      }
+    ];
+
+    const dialogueSteps = [
+      { order: 1, speaker: "Mateo", text: "¡Hola! ¿Cómo te llamas?", translation: "Hello! What is your name?", side: "left" },
+      { order: 2, speaker: "Elena", text: "¡Hola! Me llamo Elena. ¿Y tú?", translation: "Hello! My name is Elena. And you?", side: "right" },
+      { order: 3, speaker: "Mateo", text: "Me llamo Mateo. ¿Cómo estás?", translation: "My name is Mateo. How are you?", side: "left" },
+      { order: 4, speaker: "Elena", text: "Bien, gracias. ¿Y tú?", translation: "Good, thank you. And you?", side: "right" },
+      { order: 5, speaker: "Mateo", text: "Muy bien, gracias. ¡Adiós Elena!", translation: "Very well, thank you. Goodbye Elena!", side: "left" },
+      { order: 6, speaker: "Elena", text: "¡Adiós Mateo! ¡Hasta luego!", translation: "Goodbye Mateo! See you later!", side: "right" }
+    ];
+
+    const quizQuestions = [
+      {
+        question: "How do you say 'Hello!' to your friend in Spanish?",
+        options: ["¡Adiós!", "¡Hola!", "Gracias", "Buenas noches"],
+        correct: "¡Hola!",
+        hint: "Starts with an 'H', but the 'H' is silent! 🤫",
+        icon: "👋"
+      },
+      {
+        question: "If the sun is just rising, you should greet your teacher with:",
+        options: ["¡Buenas tardes!", "¡Buenas noches!", "¡Buenos días!", "Me llamo"],
+        correct: "¡Buenos días!",
+        hint: "Morning greetings share the word 'días'! ☀️",
+        icon: "🌅"
+      },
+      {
+        question: "What does '¿Cómo te llamas?' mean in English?",
+        options: ["How are you?", "What is your name?", "Good night", "Goodbye"],
+        correct: "What is your name?",
+        hint: "You ask this when meeting someone new for the first time! 📛",
+        icon: "📛"
+      },
+      {
+        question: "How would you reply to '¿Cómo estás?' if you are feeling good?",
+        options: ["¡Adiós!", "Me llamo Mateo", "Bien, gracias", "Buenos días"],
+        correct: "Bien, gracias",
+        hint: "It means 'Good, thank you'! 😊",
+        icon: "😊"
+      },
+      {
+        question: "Your mom is tucking you in to bed. What greeting matches this time of night?",
+        options: ["¡Buenas noches!", "¡Buenas tardes!", "¡Buenos días!", "¡Hola!"],
+        correct: "¡Buenas noches!",
+        hint: "Think about the night and stars! 🌙",
+        icon: "🌙"
+      }
+    ];
+
+    // --- STATE VARIABLES ---
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+    let dialogueCurrentStep = 1;
+    let showAllTranslations = false;
+
+    // --- TEXT-TO-SPEECH (TTS) ACCENT HANDLER ---
+    // Finds a premium native or standard Spanish voice engine
+    function getSpanishVoice() {
+      if (typeof window === 'undefined' || !window.speechSynthesis) return null;
+      const voices = window.speechSynthesis.getVoices();
+      // Look for any spanish accents, prioritizing ES (Spain) or MX (Mexico)
+      const esVoice = voices.find(v => v.lang.startsWith('es-MX')) ||
+                      voices.find(v => v.lang.startsWith('es-ES')) ||
+                      voices.find(v => v.lang.startsWith('es'));
+      return esVoice;
+    }
+
+    function speakSpanish(text) {
+      if (!('speechSynthesis' in window)) {
+        showTemporaryAlert("Browser Error", "Speech audio is not fully supported on this device.", "error");
+        return;
+      }
+      
+      // Stop ongoing speeches
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      const spanishVoice = getSpanishVoice();
+      if (spanishVoice) {
+        utterance.voice = spanishVoice;
+      }
+      utterance.lang = 'es-ES';
+      utterance.rate = 0.85; // Speak slightly slower for Grade 3 ears to grasp phonics
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Force load voices into browser memory (Chrome/Safari requirement)
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = () => {};
+    }
+
+    // --- FLASHCARD COMPONENT ---
+    function renderFlashcards() {
+      const container = document.getElementById("flashcards-container");
+      container.innerHTML = "";
+      
+      greetingsData.forEach(card => {
+        const div = document.createElement("div");
+        div.className = `p-6 rounded-2xl border-4 ${card.color} shadow-sm card-bounce transition-all duration-200 cursor-pointer relative flex flex-col justify-between h-48`;
+        div.setAttribute("onclick", `playCard('${card.id}', '${card.spanish.replace(/'/g, "\\'")}')`);
+        
+        div.innerHTML = `
+          <div class="flex justify-between items-start">
+            <span class="text-3xl">${card.emoji}</span>
+            <button class="bg-white/80 hover:bg-white p-2 rounded-full shadow-sm text-sm" title="Listen" aria-label="Listen Pronunciation">
+              🔊
+            </button>
+          </div>
+          <div>
+            <h3 class="text-2xl font-bold tracking-tight text-slate-900">${card.spanish}</h3>
+            <p id="translation-${card.id}" class="${showAllTranslations ? 'block' : 'hidden'} text-sm font-semibold text-slate-700 mt-1 italic">
+               → ${card.english}
+            </p>
+            <p id="hint-${card.id}" class="${showAllTranslations ? 'hidden' : 'block'} text-[11px] text-slate-500 mt-1 font-medium italic">
+              Click to hear & view translation!
+            </p>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function playCard(id, spanishText) {
+      speakSpanish(spanishText);
+      
+      // If global toggle isn't on, temporarily toggle *just* this card's translation as helper
+      if (!showAllTranslations) {
+        const transEl = document.getElementById(`translation-${id}`);
+        const hintEl = document.getElementById(`hint-${id}`);
+        
+        transEl.classList.remove("hidden");
+        hintEl.classList.add("hidden");
+        
+        // Return to normal hint after 3.5 seconds
+        setTimeout(() => {
+          if (!showAllTranslations) {
+            transEl.classList.add("hidden");
+            hintEl.classList.remove("hidden");
+          }
+        }, 3500);
+      }
+    }
+
+    function toggleAllTranslations(checked) {
+      showAllTranslations = checked;
+      renderFlashcards();
+    }
+
+
+    // --- GAME COMPONENT: CONVERSATION MATCH-UP ---
+    let shuffledDialogue = [];
+
+    function initDialogueGame() {
+      dialogueCurrentStep = 1;
+      document.getElementById("dialogue-slots").innerHTML = "";
+      document.getElementById("dialogue-complete-msg").classList.add("hidden");
+
+      // Shuffle dialogues copy for choices layout
+      shuffledDialogue = [...dialogueSteps].sort(() => Math.random() - 0.5);
+      renderDialogueChoices();
+    }
+
+    function renderDialogueChoices() {
+      const container = document.getElementById("dialogue-choices");
+      container.innerHTML = "";
+
+      shuffledDialogue.forEach(step => {
+        // If already placed, do not render in selection pool
+        if (step.order < dialogueCurrentStep) return;
+
+        const btn = document.createElement("button");
+        btn.className = "bg-white border-2 border-indigo-300 hover:border-indigo-500 text-indigo-950 font-bold px-4 py-3 rounded-xl shadow-sm text-sm transition-all text-left max-w-xs hover:bg-indigo-50 active:scale-95";
+        btn.onclick = () => selectDialogueChoice(step);
+        btn.innerHTML = `
+          <div class="flex items-center gap-1.5 mb-1">
+            <span class="text-xs text-indigo-600 bg-indigo-100 px-2 py-0.5 rounded-full">${step.speaker}</span>
+          </div>
+          <p class="text-base">${step.text}</p>
+        `;
+        container.appendChild(btn);
+      });
+
+      // Show placeholders for slots
+      const slotsContainer = document.getElementById("dialogue-slots");
+      slotsContainer.innerHTML = "";
+      
+      for(let i = 1; i <= dialogueSteps.length; i++) {
+        const matchingStep = dialogueSteps.find(s => s.order === i);
+        if (i < dialogueCurrentStep) {
+          // Placed state
+          const itemDiv = document.createElement("div");
+          const sideAlign = matchingStep.side === 'left' ? 'justify-start' : 'justify-end';
+          const bubbleColor = matchingStep.side === 'left' ? 'bg-amber-100 border-amber-200' : 'bg-emerald-100 border-emerald-200';
+          const avatar = matchingStep.side === 'left' ? '👦🏼 Mateo: ' : '👧🏻 Elena: ';
+          
+          itemDiv.className = `flex ${sideAlign} w-full`;
+          itemDiv.innerHTML = `
+            <div class="max-w-md ${bubbleColor} border-2 rounded-2xl px-4 py-2 shadow-sm relative group">
+              <span class="font-bold text-xs block text-slate-500">${avatar}</span>
+              <p class="font-bold text-slate-900">${matchingStep.text}</p>
+              <p class="text-xs text-slate-600 italic mt-0.5">${matchingStep.translation}</p>
+              <button onclick="speakSpanish('${matchingStep.text}')" class="absolute -right-3 top-2 bg-white rounded-full p-1 shadow border border-slate-200 text-xs hover:bg-slate-50">🔊</button>
+            </div>
+          `;
+          slotsContainer.appendChild(itemDiv);
+        } else {
+          // Empty slot representation
+          const emptyDiv = document.createElement("div");
+          emptyDiv.className = "border border-dashed border-slate-300 rounded-xl py-4 px-6 text-center text-sm font-semibold text-slate-400";
+          emptyDiv.innerText = `Line ${i}...`;
+          slotsContainer.appendChild(emptyDiv);
         }
+      }
+    }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+    function selectDialogueChoice(step) {
+      if (step.order === dialogueCurrentStep) {
+        // Correct next item!
+        speakSpanish(step.text);
+        dialogueCurrentStep++;
+        
+        // Pop sound trigger (using Speech synthesis API or soft web audio pitch)
+        showTemporaryAlert("¡Sí!", "Awesome job! That matches the flow perfectly.", "success");
+        
+        if (dialogueCurrentStep > dialogueSteps.length) {
+          // Finished dialogue game!
+          document.getElementById("dialogue-complete-msg").classList.remove("hidden");
+          triggerConfetti();
+        }
+        renderDialogueChoices();
+      } else {
+        // Wrong choice
+        showTemporaryAlert("¡Opps!", "That's not the next line! Try thinking about who responds.", "error");
+      }
+    }
+
+    function resetDialogueGame() {
+      initDialogueGame();
+    }
+
+
+    // --- QUIZ COMPONENT ---
+    function renderQuizQuestion() {
+      const q = quizQuestions[currentQuizIndex];
+      const container = document.getElementById("question-container");
+      
+      // Update UI Progress Info
+      document.getElementById("quiz-score-badge").innerText = `Score: ${quizScore} / 5`;
+      const percentage = (currentQuizIndex / quizQuestions.length) * 100;
+      document.getElementById("quiz-progress-bar").style.width = `${percentage}%`;
+
+      container.innerHTML = `
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-4xl bg-rose-100 p-2.5 rounded-2xl border-2 border-rose-200">${q.icon}</span>
+          <h3 class="text-lg md:text-xl font-bold text-slate-800">Question ${currentQuizIndex + 1}: ${q.question}</h3>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          ${q.options.map(opt => `
+            <button onclick="checkAnswer('${opt.replace(/'/g, "\\'")}')" class="bg-white hover:bg-rose-50 border-2 border-rose-100 hover:border-rose-400 font-bold py-3 px-5 rounded-2xl text-left shadow-sm hover:shadow transition-all text-slate-700 active:scale-95">
+              ${opt}
+            </button>
+          `).join('')}
+        </div>
+
+        <div class="mt-6 flex justify-between items-center bg-white p-3 rounded-xl border border-rose-100">
+          <span class="text-xs text-slate-500 font-semibold italic">💡 Hint: ${q.hint}</span>
+          <button onclick="speakSpanish('${q.correct.replace(/'/g, "\\'")}')" class="text-xs bg-rose-50 text-rose-600 font-bold px-3 py-1.5 rounded-lg border border-rose-200 hover:bg-rose-100 flex items-center gap-1">
+            🔊 Listen to Secret Answer
+          </button>
+        </div>
+      `;
+    }
+
+    function checkAnswer(chosen) {
+      const q = quizQuestions[currentQuizIndex];
+      if (chosen === q.correct) {
+        quizScore++;
+        showTemporaryAlert("¡Correcto!", "Excellent job! You gained points.", "success");
+      } else {
+        showTemporaryAlert("¡Oh no!", `The right greeting was "${q.correct}". Keep practicing!`, "error");
+      }
+
+      // Next Question
+      setTimeout(() => {
+        if (currentQuizIndex < quizQuestions.length - 1) {
+          currentQuizIndex++;
+          renderQuizQuestion();
+        } else {
+          // Completed the quiz
+          showQuizResults();
+        }
+      }, 1500);
+    }
+
+    function showQuizResults() {
+      const container = document.getElementById("question-container");
+      document.getElementById("quiz-score-badge").innerText = `Score: ${quizScore} / 5`;
+      document.getElementById("quiz-progress-bar").style.width = "100%";
+
+      let ratingText = "";
+      let emoji = "";
+      if (quizScore === 5) {
+        ratingText = "¡Increíble! You are a Spanish Greetings Master!";
+        emoji = "👑🥇";
+        triggerConfetti();
+      } else if (quizScore >= 3) {
+        ratingText = "¡Muy bien! Excellent effort. You know your stuff!";
+        emoji = "🌟🎉";
+        triggerConfetti();
+      } else {
+        ratingText = "Good effort! Let's study again and take another shot.";
+        emoji = "💪📖";
+      }
+
+      container.innerHTML = `
+        <div class="text-center py-6">
+          <span class="text-6xl">${emoji}</span>
+          <h3 class="text-3xl font-bold text-slate-800 mt-4">Quiz Finished!</h3>
+          <p class="text-2xl font-bold text-rose-500 mt-2">You Scored: ${quizScore} / 5</p>
+          <p class="text-slate-600 mt-2 font-medium">${ratingText}</p>
+          
+          <button onclick="restartQuiz()" class="mt-6 px-8 py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-full shadow-md transition-all active:scale-95">
+            🔄 Play Quiz Again
+          </button>
+        </div>
+      `;
+    }
+
+    function restartQuiz() {
+      currentQuizIndex = 0;
+      quizScore = 0;
+      renderQuizQuestion();
+    }
+
+
+    // --- GLOBAL TEMPORARY ALERTS (Replacing annoying browser pop-ups) ---
+    function showTemporaryAlert(title, message, type) {
+      const alertDiv = document.getElementById("custom-alert");
+      const alertTitle = document.getElementById("alert-title");
+      const alertMsg = document.getElementById("alert-msg");
+      
+      alertTitle.innerText = title;
+      alertMsg.innerText = message;
+      
+      if (type === "success") {
+        alertDiv.className = "fixed bottom-6 right-6 left-6 md:left-auto md:w-96 z-50 bg-emerald-600 text-white p-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-slide-up";
+      } else {
+        alertDiv.className = "fixed bottom-6 right-6 left-6 md:left-auto md:w-96 z-50 bg-rose-600 text-white p-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-slide-up";
+      }
+
+      alertDiv.classList.remove("hidden");
+      
+      setTimeout(() => {
+        alertDiv.classList.add("hidden");
+      }, 2500);
+    }
+
+    // --- CONFETTI LAUNCHER ---
+    function triggerConfetti() {
+      if (typeof confetti !== "undefined") {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
+    }
+
+
+    // --- LOAD ON START ---
+    window.onload = function() {
+      renderFlashcards();
+      initDialogueGame();
+      renderQuizQuestion();
+    };
+  </script>
 </body>
 </html>
