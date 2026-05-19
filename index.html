@@ -1,665 +1,100 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fiestas que cuentan historias</title>
-    
+    <title>Discover the Spanish City</title>
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
-    
-    <!-- React & ReactDOM -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    <!-- Babel for in-browser JSX compilation -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
+    <!-- Google Fonts for typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* Base typography overrides to match the design */
-        .font-sans { font-family: 'Inter', sans-serif; }
-        .font-serif { font-family: 'Merriweather', serif; }
-
-        /* Custom scrollbars */
-        ::-webkit-scrollbar {
-            width: 8px;
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-
-        /* Print specifics */
-        @media print {
-            body { background: white !important; color: black !important; }
-            .print\:hidden { display: none !important; }
-            .page-break-after-always { page-break-after: always !important; }
-            .shadow-lg, .shadow-md, .shadow-xl { box-shadow: none !important; }
-            .border-slate-100 { border-color: #cbd5e1 !important; }
+        h1, h2, h3, .serif {
+            font-family: 'Playfair Display', serif;
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen">
+<body class="bg-stone-50 text-stone-800 antialiased selection:bg-orange-200 selection:text-orange-900">
 
-    <div id="root"></div>
+    <!-- Header Section -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-orange-600 serif tracking-wide">Espléndida</div>
+            <nav class="hidden md:flex space-x-6">
+                <a href="#" class="text-stone-500 hover:text-orange-600 transition duration-300">Home</a>
+                <a href="#history" class="text-stone-500 hover:text-orange-600 transition duration-300">History</a>
+                <a href="#culture" class="text-stone-500 hover:text-orange-600 transition duration-300">Culture</a>
+            </nav>
+        </div>
+    </header>
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
+    <!-- Main Content -->
+    <main class="max-w-5xl mx-auto px-6 py-12 md:py-20">
+        
+        <!-- Hero Section -->
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <h1 class="text-5xl md:text-6xl font-bold text-stone-900 mb-6 leading-tight">
+                The Heart and Soul of <span class="text-orange-600 italic">Spain</span>
+            </h1>
+            <p class="text-lg md:text-xl text-stone-600 leading-relaxed">
+                Experience the vibrant colors, rich history, and captivating rhythms of a city that never sleeps. From stunning architecture to unforgettable gastronomy.
+            </p>
+        </div>
 
-        // Default Chapters data about beautiful Spanish Festivals
-        const defaultChapters = [
-            {
-                id: 1,
-                title: "La Tomatina",
-                location: "Buñol, Valencia",
-                date: "Último miércoles de Agosto",
-                category: "Popular",
-                summary: "La batalla pacífica de tomates más grande del mundo, donde las calles se tiñen de rojo en una explosión de alegría y tradición.",
-                content: "Cada año, miles de personas se congregan en el pequeño municipio valenciano de Buñol para participar en una de las batallas campales más peculiares de Europa. Su origen se remonta a una espontánea pelea juvenil en 1945 durante un desfile de gigantes y cabezudos. Lo que comenzó como un arrebato travieso utilizando tomates de un puesto de verduras local, se ha convertido hoy en un fenómeno de atractivo internacional, regulado y esperado con entusiasmo ferviente.",
-                image: "https://images.unsplash.com/photo-1568231358390-75513985f396?auto=format&fit=crop&w=1200&q=80"
-            },
-            {
-                id: 2,
-                title: "Las Fallas",
-                location: "Valencia",
-                date: "15 al 19 de Marzo",
-                category: "Histórica",
-                summary: "Espectaculares monumentos artísticos de cartón piedra que se erigen en la ciudad para terminar devorados por el fuego purificador.",
-                content: "Declarada Patrimonio Cultural Inmaterial de la Humanidad, esta festividad celebra la llegada de la primavera rindiendo homenaje a San José, patrón de los carpinteros. El vecindario de cada barrio diseña y construye con ingenio monumentales esculturas satíricas (fallas) que critican con humor los acontecimientos sociales del año, para luego prenderles fuego ('la cremà') en una noche mágica donde la pólvora, el fuego y la música conquistan el cielo mediterráneo.",
-                image: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=1200&q=80"
-            },
-            {
-                id: 3,
-                title: "Feria de Abril",
-                location: "Sevilla, Andalucía",
-                date: "Dos semanas después de Semana Santa",
-                category: "Cultural",
-                summary: "El alma andaluza se viste de flamenca, farolillos y casetas con el sonar de guitarras y el galope elegante de los caballos.",
-                content: "Nacida originalmente en 1847 como una feria ganadera mercantil por iniciativa de dos empresarios (un catalán y un vasco), la Feria de Abril evolucionó rápidamente hacia una colorida celebración social. El imponente recinto de el 'Real' se adorna con miles de farolillos de colores y alberga más de mil casetas particulares y públicas donde se degusta pescaito frito, se brinda con rebujito y se bailan sevillanas hasta el amanecer.",
-                image: "https://images.unsplash.com/photo-1543783207-ec64e4d95325?auto=format&fit=crop&w=1200&q=80"
-            }
-        ];
-
-        function App() {
-            // Default Cover setup with the local name 'spanish-city.jpg' as requested
-            const [coverImage, setCoverImage] = useState('spanish-city.jpg');
-            const [chapters, setChapters] = useState(defaultChapters);
-            const [selectedChapter, setSelectedChapter] = useState(null);
-            const [searchQuery, setSearchQuery] = useState('');
-            const [filterCategory, setFilterCategory] = useState('Todas');
+        <!-- Image Container -->
+        <div class="relative rounded-2xl overflow-hidden shadow-2xl mb-16 bg-stone-200 min-h-[300px] md:min-h-[500px] flex items-center justify-center group border border-stone-200">
             
-            // New Chapter Creator state
-            const [isAdding, setIsAdding] = useState(false);
-            const [newTitle, setNewTitle] = useState('');
-            const [newLocation, setNewLocation] = useState('');
-            const [newDate, setNewDate] = useState('');
-            const [newCategory, setNewCategory] = useState('Popular');
-            const [newSummary, setNewSummary] = useState('');
-            const [newContent, setNewContent] = useState('');
-            const [newImage, setNewImage] = useState('');
+            <!-- 
+              This is where your image will be displayed. 
+              The 'src' attribute is set to exactly what you requested.
+            -->
+            <img 
+                id="city-image"
+                src="spanish-city.jpg" 
+                alt="A beautiful view of a Spanish city" 
+                class="w-full h-full object-cover aspect-video md:aspect-[21/9] transition duration-700 group-hover:scale-105"
+                onerror="this.style.display='none'; document.getElementById('image-fallback').style.display='flex';"
+            >
+            
+            <!-- Fallback message shown if the image hasn't been uploaded yet -->
+            <div id="image-fallback" class="absolute inset-0 hidden flex-col items-center justify-center text-stone-500 p-6 text-center bg-stone-100">
+                <svg class="w-16 h-16 mb-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <p class="text-lg font-medium">Image Placeholder</p>
+                <p class="text-sm mt-2">Upload your <span class="font-mono bg-stone-200 px-1 py-0.5 rounded text-orange-600">spanish-city.jpg</span> file to this directory to see it here.</p>
+            </div>
+        </div>
 
-            // Edit Modal State precisely matching user's snippets
-            const [editModal, setEditModal] = useState({
-                isOpen: false,
-                chapterId: null,
-                type: '', // 'cover' or 'chapter'
-                index: 0,
-                currentUrl: '',
-                tempUrl: ''
-            });
-            const [previewError, setPreviewError] = useState(false);
+        <!-- Details Grid -->
+        <div class="grid md:grid-cols-2 gap-12 mt-12">
+            <div id="history" class="space-y-4">
+                <div class="w-12 h-1 bg-orange-500 mb-6"></div>
+                <h2 class="text-3xl font-bold text-stone-800">A Tapestry of History</h2>
+                <p class="text-stone-600 leading-relaxed">
+                    Wander through cobblestone streets that have stood for centuries. The architecture here tells a story of diverse cultural influences, blending Moorish palaces with Gothic cathedrals and modernist masterpieces. Every plaza holds a secret, and every alleyway is a journey back in time.
+                </p>
+            </div>
+            
+            <div id="culture" class="space-y-4">
+                <div class="w-12 h-1 bg-orange-500 mb-6"></div>
+                <h2 class="text-3xl font-bold text-stone-800">Vibrant Lifestyle</h2>
+                <p class="text-stone-600 leading-relaxed">
+                    As the sun sets, the city truly comes alive. Join the locals for evening tapas, savoring olives, jamón ibérico, and regional wines. The passion of the city is evident in the impromptu flamenco performances echoing from local taverns and the warmth of the people who call it home.
+                </p>
+            </div>
+        </div>
 
-            // Handler to save the customized image URL
-            const handleSaveImageUrl = () => {
-                if (editModal.type === 'cover') {
-                    setCoverImage(editModal.tempUrl);
-                } else if (editModal.type === 'chapter') {
-                    setChapters(prev => prev.map(ch => 
-                        ch.id === editModal.chapterId ? { ...ch, image: editModal.tempUrl } : ch
-                    ));
-                }
-                setEditModal({ isOpen: false, chapterId: null, type: '', index: 0, currentUrl: '', tempUrl: '' });
-                setPreviewError(false);
-            };
+    </main>
 
-            const addNewChapter = (e) => {
-                e.preventDefault();
-                if (!newTitle || !newSummary) return;
+    <!-- Footer -->
+    <footer class="bg-stone-900 text-stone-400 py-10 mt-12">
+        <div class="max-w-5xl mx-auto px-6 text-center flex flex-col items-center">
+            <div class="text-2xl font-bold text-white serif mb-4">Espléndida</div>
+            <p class="text-sm">&copy; 2026 Spanish City Guide. Designed for your journey.</p>
+        </div>
+    </footer>
 
-                const freshChapter = {
-                    id: Date.now(),
-                    title: newTitle,
-                    location: newLocation || "España",
-                    date: newDate || "Fecha variable",
-                    category: newCategory,
-                    summary: newSummary,
-                    content: newContent || "Historia por escribir...",
-                    image: newImage || "https://images.unsplash.com/photo-1509840144521-176eb5c300f9?auto=format&fit=crop&w=1200&q=80"
-                };
-
-                setChapters([freshChapter, ...chapters]);
-                setIsAdding(false);
-                setNewTitle('');
-                setNewLocation('');
-                setNewDate('');
-                setNewCategory('Popular');
-                setNewSummary('');
-                setNewContent('');
-                setNewImage('');
-            };
-
-            const deleteChapter = (id) => {
-                if (confirm('¿Estás seguro de que deseas eliminar este capítulo festivo?')) {
-                    setChapters(chapters.filter(ch => ch.id !== id));
-                    if (selectedChapter && selectedChapter.id === id) {
-                        setSelectedChapter(null);
-                    }
-                }
-            };
-
-            const filteredChapters = chapters.filter(ch => {
-                const matchesSearch = ch.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                     ch.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                     ch.summary.toLowerCase().includes(searchQuery.toLowerCase());
-                const matchesCategory = filterCategory === 'Todas' || ch.category === filterCategory;
-                return matchesSearch && matchesCategory;
-            });
-
-            return (
-                <div className="min-h-screen flex flex-col justify-between">
-                    
-                    {/* Header Banner Section */}
-                    <header className="relative bg-slate-950 text-white min-h-[460px] flex items-center overflow-hidden print:min-h-fit print:bg-white print:text-black">
-                        {/* Background Image using the user's spanish-city.jpg - Opacity set high for clear visibility */}
-                        <div className="absolute inset-0 z-0 print:hidden">
-                            <img 
-                                src={coverImage} 
-                                alt="Spanish Cityscape Cover" 
-                                className="w-full h-full object-cover opacity-80 transform scale-100 transition-all duration-700"
-                                onError={(e) => {
-                                    // Fallback to Unsplash if local file is missing during preview render
-                                    e.target.src = "https://images.unsplash.com/photo-1543783207-ec64e4d95325?auto=format&fit=crop&w=1920&q=80";
-                                }}
-                            />
-                            {/* Rich overlay to make text highly legible while showcasing the image */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
-                        </div>
-
-                        {/* Banner Content Container */}
-                        <div className="relative z-10 max-w-6xl mx-auto px-6 py-16 w-full">
-                            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                                <div className="space-y-4 max-w-2xl bg-slate-950/40 p-6 rounded-2xl backdrop-blur-sm md:bg-transparent md:p-0 md:backdrop-blur-none">
-                                    <span className="inline-block bg-orange-600 text-white text-xs font-black tracking-widest uppercase px-3 py-1.5 rounded-full shadow-lg shadow-orange-950/40 print:border print:border-black print:text-black print:bg-white">
-                                        Explora la Cultura Ibérica
-                                    </span>
-                                    <h1 className="text-4xl md:text-6xl font-black font-serif tracking-tight leading-tight drop-shadow-md">
-                                        Fiestas que cuentan <span className="text-orange-500">historias</span>
-                                    </h1>
-                                    <p className="text-lg md:text-xl text-slate-200 font-serif max-w-xl leading-relaxed print:text-slate-700 drop-shadow-sm">
-                                        Un diario interactivo a través de las tradiciones ancestrales, colores y el alma de las fiestas más emblemáticas de España.
-                                    </p>
-                                </div>
-                                
-                                <button 
-                                    onClick={() => setEditModal({
-                                        isOpen: true,
-                                        chapterId: null,
-                                        type: 'cover',
-                                        index: 0,
-                                        currentUrl: coverImage,
-                                        tempUrl: coverImage
-                                    })}
-                                    className="print:hidden flex items-center gap-2 bg-white/90 hover:bg-white text-slate-900 px-5 py-3 rounded-xl border border-white/20 transition-all font-bold text-sm shadow-xl"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 text-orange-600">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                                    </svg>
-                                    Personalizar Portada
-                                </button>
-                            </div>
-                        </div>
-                    </header>
-
-                    {/* Main Workspace */}
-                    <main className="max-w-6xl mx-auto px-6 py-12 w-full flex-grow">
-                        
-                        {/* Control Deck (Search, Filter, Add Chapter Buttons) */}
-                        <div className="print:hidden flex flex-col md:flex-row gap-4 items-center justify-between mb-10 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-                            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                                <div className="relative">
-                                    <input 
-                                        type="text" 
-                                        placeholder="Buscar fiesta o rincón..." 
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 w-full sm:w-64 bg-slate-50"
-                                    />
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
-                                    </svg>
-                                </div>
-                                <div className="flex gap-1.5 bg-slate-100 p-1 rounded-xl">
-                                    {['Todas', 'Popular', 'Histórica', 'Cultural'].map(cat => (
-                                        <button
-                                            key={cat}
-                                            onClick={() => setFilterCategory(cat)}
-                                            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${filterCategory === cat ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
-                                        >
-                                            {cat}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <button
-                                onClick={() => setIsAdding(!isAdding)}
-                                className="w-full md:w-auto bg-orange-600 hover:bg-orange-700 text-white font-black px-6 py-3 rounded-xl shadow-lg shadow-orange-100 hover:shadow-orange-200 transition-all text-sm flex items-center justify-center gap-2"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                </svg>
-                                Añadir Nueva Fiesta
-                            </button>
-                        </div>
-
-                        {/* Add New Chapter Overlay/Form */}
-                        {isAdding && (
-                            <form onSubmit={addNewChapter} className="print:hidden mb-10 bg-white p-8 rounded-2xl border border-orange-100 shadow-xl shadow-orange-50/50 space-y-6">
-                                <div className="border-b border-slate-100 pb-4">
-                                    <h3 className="text-xl font-black text-slate-800 font-serif">Añadir Nuevo Capítulo Festivo</h3>
-                                    <p className="text-xs text-slate-500">Completa la información para que forme parte del mural.</p>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-black text-slate-600 uppercase tracking-wider">Nombre de la Festividad</label>
-                                        <input 
-                                            type="text" 
-                                            required 
-                                            placeholder="Ej. Feria de San Fermín" 
-                                            value={newTitle}
-                                            onChange={(e) => setNewTitle(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 bg-slate-50 focus:outline-none"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-black text-slate-600 uppercase tracking-wider">Localización</label>
-                                        <input 
-                                            type="text" 
-                                            placeholder="Ej. Pamplona, Navarra" 
-                                            value={newLocation}
-                                            onChange={(e) => setNewLocation(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 bg-slate-50 focus:outline-none"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-black text-slate-600 uppercase tracking-wider">Fecha / Época del Año</label>
-                                        <input 
-                                            type="text" 
-                                            placeholder="Ej. 6 al 14 de Julio" 
-                                            value={newDate}
-                                            onChange={(e) => setNewDate(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 bg-slate-50 focus:outline-none"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-black text-slate-600 uppercase tracking-wider">Categoría</label>
-                                        <select 
-                                            value={newCategory} 
-                                            onChange={(e) => setNewCategory(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 bg-slate-50 focus:outline-none"
-                                        >
-                                            <option value="Popular">Popular</option>
-                                            <option value="Histórica">Histórica</option>
-                                            <option value="Cultural">Cultural</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-2 md:col-span-2">
-                                        <label className="text-xs font-black text-slate-600 uppercase tracking-wider">Imagen (URL o nombre de archivo)</label>
-                                        <input 
-                                            type="text" 
-                                            placeholder="Ej: spanish-city.jpg o enlace de Unsplash" 
-                                            value={newImage}
-                                            onChange={(e) => setNewImage(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 bg-slate-50 focus:outline-none"
-                                        />
-                                    </div>
-                                    <div className="space-y-2 md:col-span-2">
-                                        <label className="text-xs font-black text-slate-600 uppercase tracking-wider">Resumen Corto</label>
-                                        <textarea 
-                                            required 
-                                            rows="2"
-                                            placeholder="Introduce una breve introducción sobre la esencia de la fiesta..." 
-                                            value={newSummary}
-                                            onChange={(e) => setNewSummary(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 bg-slate-50 focus:outline-none"
-                                        ></textarea>
-                                    </div>
-                                    <div className="space-y-2 md:col-span-2">
-                                        <label className="text-xs font-black text-slate-600 uppercase tracking-wider">Crónica Completa (Narrativa)</label>
-                                        <textarea 
-                                            rows="4"
-                                            placeholder="Escribe la historia detallada, costumbres, origen y leyendas..." 
-                                            value={newContent}
-                                            onChange={(e) => setNewContent(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 bg-slate-50 focus:outline-none"
-                                        ></textarea>
-                                    </div>
-                                </div>
-
-                                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                                    <button 
-                                        type="button" 
-                                        onClick={() => setIsAdding(false)} 
-                                        className="px-5 py-2.5 text-slate-600 hover:bg-slate-100 rounded-xl transition font-bold"
-                                    >
-                                        Cancelar
-                                    </button>
-                                    <button 
-                                        type="submit" 
-                                        className="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl transition shadow-lg shadow-orange-100"
-                                    >
-                                        Guardar Entrada
-                                    </button>
-                                </div>
-                            </form>
-                        )}
-
-                        {/* Chapters Showcase Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            
-                            {/* Left Side: Interactive Stories Showcase */}
-                            <div className="md:col-span-2 space-y-8">
-                                <h2 className="text-2xl font-black text-slate-800 font-serif border-b pb-3 border-slate-200 flex items-center justify-between">
-                                    <span>Fiestas Populares y Crónicas</span>
-                                    <span className="text-sm font-sans font-bold text-slate-400">{filteredChapters.length} listadas</span>
-                                </h2>
-
-                                {filteredChapters.length === 0 ? (
-                                    <div className="text-center py-20 bg-white rounded-3xl border border-slate-100">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 text-slate-300 mx-auto mb-4">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008h-.008v-.008z" />
-                                        </svg>
-                                        <p className="text-slate-500 font-serif text-lg">No encontramos crónicas que coincidan con la búsqueda.</p>
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                        {filteredChapters.map(chapter => (
-                                            <article key={chapter.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-                                                <div>
-                                                    <div className="relative h-48 overflow-hidden bg-slate-200">
-                                                        <img 
-                                                            src={chapter.image} 
-                                                            alt={chapter.title} 
-                                                            className="w-full h-full object-cover"
-                                                            onError={(e) => {
-                                                                e.target.src = "https://images.unsplash.com/photo-1509840144521-176eb5c300f9?auto=format&fit=crop&w=800&q=80";
-                                                            }}
-                                                        />
-                                                        <div className="absolute top-3 right-3 flex gap-1.5">
-                                                            <button 
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    setEditModal({
-                                                                        isOpen: true,
-                                                                        chapterId: chapter.id,
-                                                                        type: 'chapter',
-                                                                        index: 0,
-                                                                        currentUrl: chapter.image,
-                                                                        tempUrl: chapter.image
-                                                                    });
-                                                                }}
-                                                                className="p-2 bg-white/95 hover:bg-white text-slate-700 rounded-full shadow-md transition-all"
-                                                                title="Cambiar Imagen"
-                                                            >
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
-                                                                </svg>
-                                                            </button>
-                                                            <button 
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    deleteChapter(chapter.id);
-                                                                }}
-                                                                className="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-full shadow-md transition-all"
-                                                                title="Eliminar Entrada"
-                                                            >
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                                                </svg>
-                                                            </button>
-                                                        </div>
-                                                        <span className="absolute bottom-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] tracking-widest font-black uppercase px-2.5 py-1 rounded">
-                                                            {chapter.category}
-                                                        </span>
-                                                    </div>
-
-                                                    <div className="p-6 space-y-3">
-                                                        <div className="flex items-center gap-2 text-xs text-orange-600 font-bold">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25s-7.5-4.108-7.5-11.25gA7.5 7.5 0 1119.5 10.5z" />
-                                                            </svg>
-                                                            {chapter.location}
-                                                        </div>
-                                                        <h3 className="text-xl font-bold font-serif text-slate-800 leading-snug">{chapter.title}</h3>
-                                                        <p className="text-slate-500 text-xs italic">{chapter.date}</p>
-                                                        <p className="text-slate-600 text-sm leading-relaxed line-clamp-3">{chapter.summary}</p>
-                                                    </div>
-                                                </div>
-
-                                                <div className="p-6 pt-0 border-t border-slate-50 mt-4">
-                                                    <button 
-                                                        onClick={() => setSelectedChapter(chapter)}
-                                                        className="w-full text-center bg-slate-100 hover:bg-orange-600 hover:text-white text-slate-700 font-bold text-xs py-3 rounded-xl transition"
-                                                    >
-                                                        Leer Crónica Completa
-                                                    </button>
-                                                </div>
-                                            </article>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Right Side: Chapter Details & Dynamic Cover Showcase */}
-                            <div className="space-y-6">
-                                
-                                {/* Visible Cover Showcase Card to guarantee spanish-city.jpg shows up */}
-                                <div className="bg-white p-6 rounded-2xl border-2 border-orange-100 shadow-md space-y-4">
-                                    <div className="flex items-center justify-between">
-                                        <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">
-                                            🖼️ Imagen de Portada Activa
-                                        </h3>
-                                        <span className="text-[10px] bg-emerald-100 text-emerald-800 font-black px-2 py-0.5 rounded-full">
-                                            Vinculada
-                                        </span>
-                                    </div>
-                                    <div className="relative h-32 rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
-                                        <img 
-                                            src={coverImage} 
-                                            alt="Current active cover display" 
-                                            className="w-full h-full object-cover"
-                                            onError={(e) => {
-                                                e.target.src = "https://images.unsplash.com/photo-1543783207-ec64e4d95325?auto=format&fit=crop&w=800&q=80";
-                                            }}
-                                        />
-                                        <div className="absolute inset-0 bg-black/10 hover:bg-black/0 transition-all"></div>
-                                    </div>
-                                    <div className="text-xs text-slate-500 flex flex-col gap-1">
-                                        <p className="font-mono text-slate-700 font-bold truncate">Archivo: {coverImage}</p>
-                                        <p className="leading-relaxed">Esta sección confirma que la imagen se ha cargado como la ilustración principal del portal.</p>
-                                    </div>
-                                    <button 
-                                        onClick={() => setEditModal({
-                                            isOpen: true,
-                                            chapterId: null,
-                                            type: 'cover',
-                                            index: 0,
-                                            currentUrl: coverImage,
-                                            tempUrl: coverImage
-                                        })}
-                                        className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition-all"
-                                    >
-                                        Cambiar archivo de portada
-                                    </button>
-                                </div>
-
-                                <h2 className="text-2xl font-black text-slate-800 font-serif border-b pb-3 border-slate-200">
-                                    Bitácora de Lectura
-                                </h2>
-
-                                {selectedChapter ? (
-                                    <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm space-y-6">
-                                        <div className="relative h-56 rounded-xl overflow-hidden bg-slate-100">
-                                            <img 
-                                                src={selectedChapter.image} 
-                                                alt={selectedChapter.title} 
-                                                className="w-full h-full object-cover"
-                                                onError={(e) => {
-                                                    e.target.src = "https://images.unsplash.com/photo-1509840144521-176eb5c300f9?auto=format&fit=crop&w=800&q=80";
-                                                }}
-                                            />
-                                        </div>
-
-                                        <div className="space-y-4">
-                                            <span className="text-xs font-black tracking-widest uppercase bg-orange-100 text-orange-700 px-2.5 py-1 rounded">
-                                                {selectedChapter.category}
-                                            </span>
-                                            <h3 className="text-3xl font-black font-serif text-slate-800 tracking-tight leading-tight">
-                                                {selectedChapter.title}
-                                            </h3>
-                                            
-                                            <div className="space-y-1.5 text-xs text-slate-500 border-l-2 border-slate-200 pl-3">
-                                                <p className="font-bold text-slate-700">📍 {selectedChapter.location}</p>
-                                                <p>📅 {selectedChapter.date}</p>
-                                            </div>
-
-                                            <p className="text-slate-600 font-serif leading-relaxed italic border-t border-b py-4 border-slate-100">
-                                                "{selectedChapter.summary}"
-                                            </p>
-
-                                            <div className="text-slate-700 font-serif leading-relaxed text-sm space-y-4 whitespace-pre-line pt-2">
-                                                {selectedChapter.content}
-                                            </div>
-                                        </div>
-
-                                        <div className="flex justify-between gap-4 pt-6 border-t border-slate-100">
-                                            <button 
-                                                onClick={() => window.print()} 
-                                                className="flex-1 flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition text-xs"
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.844l-.278-.052A4.5 4.5 0 0013.5 16.75h3.812a3.375 3.375 0 003.375-3.375V11.25M6.72 13.844a4.5 4.5 0 011.83-3.235l.006-.005a4.503 4.503 0 015.346.005h0a4.5 4.5 0 011.61 3.233M19.5 10.5a7.5 7.5 0 11-15 0V7.5a3 3 0 013-3h9a3 3 0 013 3v3z" />
-                                                </svg>
-                                                Imprimir Relato
-                                            </button>
-                                            <button 
-                                                onClick={() => setSelectedChapter(null)}
-                                                className="flex-1 text-center border border-slate-200 hover:bg-slate-50 text-slate-500 font-bold py-3 rounded-xl transition text-xs"
-                                            >
-                                                Cerrar Diario
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="bg-slate-100 border-2 border-dashed border-slate-200 p-8 rounded-2xl text-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-12 h-12 text-slate-400 mx-auto mb-4">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-                                        </svg>
-                                        <h4 className="font-serif font-black text-slate-700 text-lg mb-1">Sin lectura seleccionada</h4>
-                                        <p className="text-slate-500 text-xs leading-relaxed">Elige cualquier crónica festiva del listado para adentrarte en su folclor e historia.</p>
-                                    </div>
-                                )}
-                            </div>
-
-                        </div>
-                    </main>
-
-                    {/* Simple Decorative Footer */}
-                    <footer className="bg-slate-900 text-slate-400 py-8 border-t border-slate-800 text-center text-xs print:hidden">
-                        <p className="font-serif italic text-slate-300">"El pueblo que canta y baila, ahuyenta sus males."</p>
-                        <p className="mt-2 text-slate-500">© 2026 Bitácora Tradicional de España. Creado con fines culturales.</p>
-                    </footer>
-
-                    {/* Interactive Image Edit Modal matching snippet logic */}
-                    {editModal.isOpen && (
-                        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 print:hidden animate-fade-in">
-                            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-100 space-y-6">
-                                <div className="space-y-1">
-                                    <h3 className="text-xl font-serif font-black text-slate-800">Actualizar Imagen</h3>
-                                    <p className="text-xs text-slate-400">Inserta un enlace web o nombre de archivo de tu repositorio local.</p>
-                                </div>
-
-                                <div className="space-y-4">
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Dirección URL o nombre de recurso</label>
-                                        <input 
-                                            type="text" 
-                                            value={editModal.tempUrl}
-                                            onChange={(e) => {
-                                                setEditModal({ ...editModal, tempUrl: e.target.value });
-                                                setPreviewError(false);
-                                            }}
-                                            placeholder="Introduce el enlace..."
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:outline-none bg-slate-50 text-sm"
-                                        />
-                                    </div>
-
-                                    {/* Real-time Preview */}
-                                    <div className="h-44 rounded-2xl bg-slate-100 overflow-hidden border border-slate-200 flex items-center justify-center relative">
-                                        {editModal.tempUrl ? (
-                                            <img 
-                                                src={editModal.tempUrl} 
-                                                alt="Preview" 
-                                                className="w-full h-full object-cover"
-                                                onError={() => setPreviewError(true)}
-                                            />
-                                        ) : (
-                                            <span className="text-slate-400 font-medium text-xs">Pega un enlace para ver la imagen</span>
-                                        )}
-                                        {previewError && editModal.tempUrl && (
-                                            <div className="absolute inset-0 bg-red-50/90 flex items-center justify-center p-4 text-center">
-                                                <p className="text-red-500 text-xs font-bold leading-relaxed">No se pudo cargar la vista previa. Asegúrate de que la dirección sea correcta o continúa para confirmar.</p>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="flex justify-end gap-3 mt-4">
-                                        <button
-                                            onClick={() => {
-                                                setEditModal({ isOpen: false, chapterId: null, type: '', index: 0, currentUrl: '', tempUrl: '' });
-                                                setPreviewError(false);
-                                            }}
-                                            className="px-6 py-3 text-slate-600 font-bold hover:bg-slate-100 rounded-xl transition"
-                                        >
-                                            Cancelar
-                                        </button>
-                                        <button
-                                            onClick={handleSaveImageUrl}
-                                            disabled={!editModal.tempUrl}
-                                            className={`px-6 py-3 font-black rounded-xl transition shadow-lg ${!editModal.tempUrl ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none' : 'bg-orange-600 text-white hover:bg-orange-700 shadow-orange-200'}`}
-                                        >
-                                            Guardar Imagen
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                </div>
-            );
-        }
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
 </body>
 </html>
