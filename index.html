@@ -6,7 +6,7 @@
     <title>Fiestas que cuentan historias</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
     
     <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -19,1181 +19,601 @@
         .font-sans { font-family: 'Inter', sans-serif; }
         .font-serif { font-family: 'Merriweather', serif; }
 
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
         /* Print specifics */
         @media print {
             body { background: white !important; color: black !important; }
             .print\:hidden { display: none !important; }
             .page-break-after-always { page-break-after: always !important; }
-            * {
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
+            .shadow-lg, .shadow-md, .shadow-xl { box-shadow: none !important; }
+            .border-slate-100 { border-color: #cbd5e1 !important; }
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans antialiased">
+<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen">
+
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // SVG equivalents of the lucide-react icons used in the app
-        const Icon = ({ children, size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                {children}
-            </svg>
-        );
-
-        const BookOpen = (p) => <Icon {...p}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></Icon>;
-        const MapPin = (p) => <Icon {...p}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></Icon>;
-        const Calendar = (p) => <Icon {...p}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></Icon>;
-        const Info = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></Icon>;
-        const Edit3 = (p) => <Icon {...p}><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></Icon>;
-        const ArrowRight = (p) => <Icon {...p}><line x1="5" x2="19" y1="12" y2="12"/><polyline points="12 5 19 12 12 19"/></Icon>;
-        const ArrowLeft = (p) => <Icon {...p}><line x1="19" x2="5" y1="12" y2="12"/><polyline points="12 19 5 12 12 5"/></Icon>;
-        const List = (p) => <Icon {...p}><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></Icon>;
-        const Globe = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></Icon>;
-        const ChevronRight = (p) => <Icon {...p}><polyline points="9 18 15 12 9 6"/></Icon>;
-        const CheckCircle2 = (p) => <Icon {...p}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></Icon>;
-        const Printer = (p) => <Icon {...p}><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></Icon>;
-        const ExternalLink = (p) => <Icon {...p}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></Icon>;
-        const PlayCircle = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></Icon>;
-        const TrendingUp = (p) => <Icon {...p}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></Icon>;
-        const Camera = (p) => <Icon {...p}><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></Icon>;
-        const ImageIcon = (p) => <Icon {...p}><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></Icon>;
-
-        const initialBookData = [
-          // NIVEL INICIAL (A2-B1)
-          {
-            id: 1,
-            title: "Día de los Muertos",
-            country: "México",
-            vocabLevel: "Nivel Inicial",
-            storyTitle: "Las flores de la memoria",
-            story: [
-              "El olor dulce del pan inundaba la casa. Camila miraba cómo su abuela colocaba una flor naranja, llamada cempasúchil, en el centro de la mesa.",
-              "—Sigo sin entender por qué estamos tan felices si hoy es el día de los muertos —dijo Camila.",
-              "—Porque no es un día triste, mija —respondió la abuela mientras encendía una vela—. Este altar es para recordar a las personas que amamos. Mientras pongamos su comida favorita en esta ofrenda, ellos siempre estarán con nosotros.",
-              "Esa noche, en el cementerio, había música, colores y familias enteras cenando junto a las tumbas de sus difuntos.",
-              "Camila comprendió que en su cultura, la muerte no da miedo; es solo un paso más en el viaje de la vida."
-            ],
-            culture: {
-              date: "1 y 2 de noviembre",
-              origin: "Unión de tradiciones indígenas y catolicismo",
-              elements: ["Ofrendas (altares)", "Flores de cempasúchil", "Pan de muerto", "Papel picado", "Calaveritas"],
-              meaning: "La celebración honra a los difuntos y celebra su retorno temporal al mundo de los vivos.",
-              gallery: [
-                "https://images.unsplash.com/photo-1541434691456-11f8e13f411d?auto=format&fit=crop&w=800&q=80",
-                "https://images.unsplash.com/photo-1572449043416-55f4685c9bb7?auto=format&fit=crop&w=800&q=80"  
-              ],
-              videos: [
-                { title: "Documental: El significado del Altar", url: "https://www.youtube.com/results?search_query=Dia+de+los+muertos+documental+altar" },
-                { title: "Desfile de Día de Muertos en CDMX", url: "https://www.youtube.com/results?search_query=desfile+dia+de+muertos+cdmx" }
-              ]
+        // Default Chapters data about beautiful Spanish Festivals
+        const defaultChapters = [
+            {
+                id: 1,
+                title: "La Tomatina",
+                location: "Buñol, Valencia",
+                date: "Último miércoles de Agosto",
+                category: "Popular",
+                summary: "La batalla pacífica de tomates más grande del mundo, donde las calles se tiñen de rojo en una explosión de alegría y tradición.",
+                content: "Cada año, miles de personas se congregan en el pequeño municipio valenciano de Buñol para participar en una de las batallas campales más peculiares de Europa. Su origen se remonta a una espontánea pelea juvenil en 1945 durante un desfile de gigantes y cabezudos. Lo que comenzó como un arrebato travieso utilizando tomates de un puesto de verduras local, se ha convertido hoy en un fenómeno de atractivo internacional, regulado y esperado con entusiasmo ferviente.",
+                image: "https://images.unsplash.com/photo-1568231358390-75513985f396?auto=format&fit=crop&w=1200&q=80"
             },
-            keywords: [
-              { word: "flor", translation: "flower" },
-              { word: "vela", translation: "candle" },
-              { word: "recordar", translation: "to remember" },
-              { word: "altar", translation: "altar / shrine" },
-              { word: "difunto", translation: "deceased person" },
-              { word: "ofrenda", translation: "offering (for the altar)" }
-            ],
-            activities: [
-              "¿Por qué la abuela de Camila dice que no es un día triste?",
-              "Busca en el vocabulario la palabra 'ofrenda'. ¿Qué cosas pondrías tú en una ofrenda para alguien importante?",
-              "Compara el ambiente de esta noche en el cementerio con cómo se vive la muerte en tu propia cultura."
-            ],
-            image: "https://images.unsplash.com/photo-1509017174183-0b7e0278f1ec?auto=format&fit=crop&w=1000&q=80"
-          },
-          {
-            id: 2,
-            title: "Las Fallas",
-            country: "España",
-            vocabLevel: "Nivel Inicial",
-            storyTitle: "Cenizas de renovación",
-            story: [
-              "Valeria miraba la enorme figura de madera y cartón en el centro de la plaza. Era un 'ninot', una estatua muy cómica sobre políticos locales.",
-              "—¡Es tan bonita! Es una pena que el fuego la vaya a quemar esta noche —dijo su amigo Lucas, un poco triste.",
-              "—Esa es la idea —explicó Valeria sonriendo—. Las Fallas nos enseñan que tenemos que destruir lo viejo para empezar algo nuevo. El fuego limpia lo obsoleto.",
-              "A la medianoche, comenzó la famosa 'cremà'. Las llamas iluminaron las calles de Valencia y el calor se sentía en las caras de todas las personas.",
-              "Mientras la figura se convertía en cenizas, Valeria pensó en todo lo malo que había pasado ese año, lista para empezar de nuevo."
-            ],
-            culture: {
-              date: "Del 15 al 19 de marzo",
-              origin: "Antigua tradición de carpinteros que quemaban restos de madera en primavera",
-              elements: ["Fallas (monumentos)", "Ninots (figuras)", "La Mascletà (espectáculo sonoro)", "La Cremà (quema)"],
-              meaning: "Celebración que marca el fin del invierno y la purificación a través del fuego.",
-              gallery: [
-                "https://images.unsplash.com/photo-1584285408985-1b4e31885b59?auto=format&fit=crop&w=800&q=80",
-                "https://images.unsplash.com/photo-1520338801623-6b88fe32bbf2?auto=format&fit=crop&w=800&q=80"  
-              ],
-              videos: [
-                { title: "Así es la Cremà de una Falla Mayor", url: "https://www.youtube.com/results?search_query=la+crema+fallas+valencia" },
-                { title: "¿Qué es una Mascletà?", url: "https://www.youtube.com/results?search_query=mascleta+valencia" }
-              ]
+            {
+                id: 2,
+                title: "Las Fallas",
+                location: "Valencia",
+                date: "15 al 19 de Marzo",
+                category: "Histórica",
+                summary: "Espectaculares monumentos artísticos de cartón piedra que se erigen en la ciudad para terminar devorados por el fuego purificador.",
+                content: "Declarada Patrimonio Cultural Inmaterial de la Humanidad, esta festividad celebra la llegada de la primavera rindiendo homenaje a San José, patrón de los carpinteros. El vecindario de cada barrio diseña y construye con ingenio monumentales esculturas satíricas (fallas) que critican con humor los acontecimientos sociales del año, para luego prenderles fuego ('la cremà') en una noche mágica donde la pólvora, el fuego y la música conquistan el cielo mediterráneo.",
+                image: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=1200&q=80"
             },
-            keywords: [
-              { word: "fuego", translation: "fire" },
-              { word: "quemar", translation: "to burn" },
-              { word: "figura", translation: "figure / statue" },
-              { word: "ninot", translation: "satirical figure/doll" },
-              { word: "cenizas", translation: "ashes" },
-              { word: "obsoleto", translation: "obsolete / outdated" }
-            ],
-            activities: [
-              "¿Qué material se usa principalmente para construir las figuras en esta celebración?",
-              "Según Valeria, ¿cuál es el significado profundo de quemar una obra de arte tan bonita?",
-              "Escribe sobre una cosa vieja o 'obsoleta' en tu vida que te gustaría dejar atrás."
-            ],
-            image: "https://images.unsplash.com/photo-1552599299-92b0c9f131a9?auto=format&fit=crop&w=1000&q=80"
-          },
-          {
-            id: 3,
-            title: "Carnaval de Barranquilla",
-            country: "Colombia",
-            vocabLevel: "Nivel Inicial",
-            storyTitle: "El pulso del Caribe",
-            story: [
-              "Mateo se puso su máscara colorida. Hoy era el día grande del carnaval y su grupo, la comparsa, estaba listo para bailar por toda la calle.",
-              "—¡Escucha ese tambor! —le gritó su madre con alegría—. ¡Siente la música en tus pies!",
-              "Mateo empezó a bailar cumbia. A su alrededor había personas disfrazadas de animales africanos, con trajes indígenas y ropas españolas antiguas.",
-              "Todo el mundo reía y bailaba bajo el sol del Caribe. No importaban los problemas de la escuela o de la casa.",
-              "Mateo entendió que esa mezcla de culturas, ese gran mestizaje, era lo que hacía a su ciudad tan especial y feliz."
-            ],
-            culture: {
-              date: "Febrero o marzo (antes del Miércoles de Ceniza)",
-              origin: "Fusión triétnica: indígena, africana y española",
-              elements: ["Batalla de Flores", "Cumbia y Mapalé", "Disfraces (Marimonda, Garabato)"],
-              meaning: "Obra Maestra de la Humanidad (UNESCO); celebra la alegría y la diversidad cultural.",
-              gallery: [
-                "https://images.unsplash.com/photo-1582294157116-2e2e9c1d0f50?auto=format&fit=crop&w=800&q=80",
-                "https://images.unsplash.com/photo-1560067160-5a3f2b4539b2?auto=format&fit=crop&w=800&q=80"  
-              ],
-              videos: [
-                { title: "La Gran Batalla de Flores", url: "https://www.youtube.com/results?search_query=batalla+de+flores+barranquilla" },
-                { title: "Origen de las danzas del Carnaval", url: "https://www.youtube.com/results?search_query=danzas+tradicionales+carnaval+de+barranquilla" }
-              ]
-            },
-            keywords: [
-              { word: "bailar", translation: "to dance" },
-              { word: "tambor", translation: "drum" },
-              { word: "alegría", translation: "joy / happiness" },
-              { word: "máscara", translation: "mask" },
-              { word: "comparsa", translation: "parade group / troupe" },
-              { word: "mestizaje", translation: "cultural blending" }
-            ],
-            activities: [
-              "¿De qué tres culturas provienen las influencias del Carnaval de Barranquilla?",
-              "Explica cómo se siente Mateo al escuchar el sonido del 'tambor'.",
-              "La palabra 'mestizaje' significa mezcla de culturas. Da un ejemplo de mestizaje en tu país (comida, música, idioma)."
-            ],
-            image: "https://images.unsplash.com/photo-1594119864705-773df4fb4890?auto=format&fit=crop&w=1000&q=80"
-          },
-          
-          // NIVEL INTERMEDIO (B1-B2)
-          {
-            id: 4,
-            title: "Inti Raymi",
-            country: "Perú",
-            vocabLevel: "Nivel Intermedio",
-            storyTitle: "El renacer del Sol",
-            story: [
-              "El viento helado del invierno andino golpeaba la cara de Diego, pero la energía de la multitud en la antigua fortaleza de piedra lo mantenía caliente.",
-              "De pronto, un hombre vestido como el antiguo emperador Sapa Inca alzó sus brazos de oro hacia el cielo para venerar al dios Sol.",
-              "—Abuelo, ¿por qué seguimos haciendo ceremonias de un imperio que desapareció hace siglos? —preguntó Diego.",
-              "—Porque aunque el imperio no exista, la lengua quechua y estas montañas siguen aquí —respondió el abuelo con orgullo—.",
-              "Diego comprendió entonces que la celebración no era solo una obra de teatro. Era la cosmovisión viva de sus ancestros agradeciendo a la tierra por los alimentos recibidos."
-            ],
-            culture: {
-              date: "24 de junio (Solsticio de invierno en el hemisferio sur)",
-              origin: "Ceremonia religiosa del Imperio Incaico",
-              elements: ["Escenificación teatral", "Idioma quechua", "Ofrendas agrícolas", "Música folclórica"],
-              meaning: "Rito de gratitud al dios Sol por las cosechas pasadas y petición de fertilidad para el nuevo ciclo.",
-              gallery: [
-                "https://images.unsplash.com/photo-1587595431973-125d050c2628?auto=format&fit=crop&w=800&q=80",
-                "https://images.unsplash.com/photo-1542358896-72dc7d38ccb8?auto=format&fit=crop&w=800&q=80"  
-              ],
-              videos: [
-                { title: "Ceremonia Central del Inti Raymi", url: "https://www.youtube.com/results?search_query=inti+raymi+sacsayhuaman+oficial" },
-                { title: "La importancia del Quechua", url: "https://www.youtube.com/results?search_query=importancia+idioma+quechua+peru" }
-              ]
-            },
-            keywords: [
-              { word: "sol", translation: "sun" },
-              { word: "piedra", translation: "stone" },
-              { word: "antiguo", translation: "ancient / old" },
-              { word: "ceremonia", translation: "ceremony" },
-              { word: "venerar", translation: "to venerate / worship" },
-              { word: "cosmovisión", translation: "worldview" }
-            ],
-            activities: [
-              "¿Qué estación del año es en Perú cuando se celebra el Inti Raymi? ¿Por qué es importante para la historia?",
-              "El abuelo menciona que la cultura sigue viva gracias a dos cosas. ¿Cuáles son?",
-              "Usa la palabra 'cosmovisión' para explicar cómo ve el mundo una comunidad indígena que conoces."
-            ],
-            image: "https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&w=1000&q=80"
-          },
-          {
-            id: 5,
-            title: "La Tomatina",
-            country: "España",
-            vocabLevel: "Nivel Intermedio",
-            storyTitle: "Catarsis carmesí",
-            story: [
-              "Para Sofía, viajar hasta un pequeño pueblo en España solo para participar en una guerra de comida parecía una locura total.",
-              "Pero cuando un gran camión apareció en la plaza tirando toneladas de tomates maduros, Sofía olvidó la lógica. Al sonar el cohete, comenzó el desenfreno.",
-              "Tomates volaban por los aires. Ella recibió un golpe suave en el hombro, resbaló en el suelo rojo y estalló en carcajadas junto a turistas de Japón y Australia.",
-              "Cubierta de pulpa de la cabeza a los pies, Sofía sintió una profunda catarsis.",
-              "A veces, descubrió, compartir un momento absurdo y caótico con extraños es la mejor forma de liberar todo el estrés acumulado."
-            ],
-            culture: {
-              date: "Último miércoles de agosto",
-              origin: "Pelea espontánea de jóvenes en 1945",
-              elements: ["Camiones con tomates", "Miles de participantes", "Limpieza comunitaria posterior"],
-              meaning: "Festividad puramente lúdica que fomenta la liberación del estrés y atrae turismo internacional.",
-              gallery: [
-                "https://images.unsplash.com/photo-1558227498-8424263ec8eb?auto=format&fit=crop&w=800&q=80",
-                "https://images.unsplash.com/photo-1598128558393-70ff21433be0?auto=format&fit=crop&w=800&q=80"  
-              ],
-              videos: [
-                { title: "Dentro de la Batalla de La Tomatina", url: "https://www.youtube.com/results?search_query=la+tomatina+buñol+experiencia" },
-                { title: "El origen curioso de la fiesta", url: "https://www.youtube.com/results?search_query=origen+historia+tomatina+buñol" }
-              ]
-            },
-            keywords: [
-              { word: "calle", translation: "street" },
-              { word: "turista", translation: "tourist" },
-              { word: "locura", translation: "madness / craziness" },
-              { word: "desenfreno", translation: "wildness / lack of control" },
-              { word: "catarsis", translation: "catharsis / emotional release" },
-              { word: "lúdico", translation: "playful / for leisure" }
-            ],
-            activities: [
-              "¿Cómo describe el texto el cambio de actitud de Sofía desde el principio hasta el final del evento?",
-              "En el texto se menciona que turistas de todo el mundo ríen juntos. ¿Qué nos dice esto sobre el lenguaje no verbal?",
-              "Debate ético: La fiesta tiene un espíritu 'lúdico', pero destruye mucha comida. ¿Crees que debería prohibirse? Justifica."
-            ],
-            image: "https://images.unsplash.com/photo-1524850301259-7729d41d11d9?auto=format&fit=crop&w=1000&q=80"
-          },
-          {
-            id: 6,
-            title: "San Fermín",
-            country: "España",
-            vocabLevel: "Nivel Intermedio",
-            storyTitle: "Adrenalina y controversia",
-            story: [
-              "Javier vestía ropa blanca muy limpia y un pañuelo rojo en el cuello. Estaba preparado para correr, pero cuando escuchó el sonido del cohete, o chupinazo, sintió miedo.",
-              "El suelo temblaba. Toros enormes y pesados venían corriendo por la calle estrecha. Su amigo Marcos empezó a correr, pero Javier se detuvo.",
-              "La adrenalina era muy alta, pero la constante controversia sobre el peligro y el trato a los animales invadió su mente.",
-              "En lugar de correr, Javier decidió saltar detrás de la valla de madera para observar desde un lugar seguro.",
-              "Ese día aprendió que decir \"no\" a la presión de sus amigos para mantener sus propios valores también requiere mucha valentía."
-            ],
-            culture: {
-              date: "Del 6 al 14 de julio",
-              origin: "Fiestas en honor a San Fermín combinadas con ferias comerciales de ganado",
-              elements: ["El Chupinazo (cohete)", "Los encierros (correr con toros)", "Vestimenta blanca y roja"],
-              meaning: "Tradición histórica famosa internacionalmente, aunque actualmente centro de debates sobre derechos animales.",
-              gallery: [
-                "https://images.unsplash.com/photo-1582046864459-7170a442a9b4?auto=format&fit=crop&w=800&q=80",
-                "https://images.unsplash.com/photo-1591485423007-765b40f80b18?auto=format&fit=crop&w=800&q=80"  
-              ],
-              videos: [
-                { title: "El recorrido técnico del encierro", url: "https://www.youtube.com/results?search_query=encierro+san+fermin+calle+estafeta" },
-                { title: "Debate: Cultura vs. Derechos Animales", url: "https://www.youtube.com/results?search_query=debate+tauromaquia+san+fermin" }
-              ]
-            },
-            keywords: [
-              { word: "toro", translation: "bull" },
-              { word: "peligro", translation: "danger" },
-              { word: "correr", translation: "to run" },
-              { word: "valentía", translation: "bravery" },
-              { word: "chupinazo", translation: "rocket marking the start" },
-              { word: "controversia", translation: "controversy" }
-            ],
-            activities: [
-              "¿Qué dos emociones fuertes siente Javier cuando se acercan los animales?",
-              "¿Por qué se dice que hay una 'controversia' sobre esta festividad?",
-              "Javier decidió no correr por sus propios principios. Escribe sobre un momento en el que tú fuiste valiente al ir contra la presión del grupo."
-            ],
-            image: "https://images.unsplash.com/photo-1563804863-718fa6f33230?auto=format&fit=crop&w=1000&q=80"
-          },
-          {
-            id: 7,
-            title: "Carnaval de Oruro",
-            country: "Bolivia",
-            vocabLevel: "Nivel Intermedio",
-            storyTitle: "Máscaras del inframundo",
-            story: [
-              "A cuatro mil metros de altura, a Lucía le costaba respirar. Su máscara de diablo, con grandes cuernos curvos, era muy pesada, pero ella seguía bailando.",
-              "De niña, esos trajes la asustaban mucho. Parecían monstruos de las pesadillas.",
-              "—No son solo demonios —le había explicado su tío—. Muestran el sincretismo de nuestra cultura. Representan la dualidad: bailamos para la Virgen católica, pero nuestros pies tocan la tierra de los espíritus mineros indígenas.",
-              "Rodeada de música fuerte y fuego, Lucía sintió un orgullo profundo al saltar y girar frente al público.",
-              "Al llevar ese traje brillante, ya no sentía miedo. Sentía la fascinante historia y la resistencia de su país en cada movimiento."
-            ],
-            culture: {
-              date: "Febrero o marzo",
-              origin: "Unión de los rituales de la etnia Uru y la devoción católica a la Virgen de la Candelaria",
-              elements: ["La Diablada", "El Tío de la Mina", "Máscaras grotescas", "Bandas de metales"],
-              meaning: "Representa la lucha del bien contra el mal y la dualidad cultural andina.",
-              gallery: [
-                "https://images.unsplash.com/photo-1525286102404-51783cf6a8b6?auto=format&fit=crop&w=800&q=80",
-                "https://images.unsplash.com/photo-1516053351239-0d3f82522c06?auto=format&fit=crop&w=800&q=80"  
-              ],
-              videos: [
-                { title: "El esplendor de la Diablada de Oruro", url: "https://www.youtube.com/results?search_query=diablada+carnaval+oruro+oficial" },
-                { title: "El mito del Tío de la Mina", url: "https://www.youtube.com/results?search_query=leyenda+el+tio+de+la+mina+bolivia" }
-              ]
-            },
-            keywords: [
-              { word: "pesado", translation: "heavy" },
-              { word: "orgullo", translation: "pride" },
-              { word: "máscara", translation: "mask" },
-              { word: "asustar", translation: "to frighten" },
-              { word: "dualidad", translation: "duality" },
-              { word: "sincretismo", translation: "syncretism (blending of cultures)" }
-            ],
-            activities: [
-              "Busca la palabra 'sincretismo' en el vocabulario. ¿Cómo se ve este concepto reflejado en el traje de Lucía?",
-              "El texto menciona que Lucía baila a 4000 metros de altura. ¿Cómo crees que esto afecta el esfuerzo físico de la celebración?",
-              "¿Qué significado tiene la máscara para Lucía cuando es niña, y cómo cambia ese significado cuando crece?"
-            ],
-            image: "https://images.unsplash.com/photo-1583048995772-2dbfcb2ba722?auto=format&fit=crop&w=1000&q=80"
-          },
-
-          // NIVEL AVANZADO (B2-C1)
-          {
-            id: 8,
-            title: "Virgen de la Candelaria",
-            country: "Perú",
-            vocabLevel: "Nivel Avanzado",
-            storyTitle: "Metales en el Altiplano",
-            story: [
-              "La ciudad de Puno despertaba cubierta de escarcha, pero el fervor inquebrantable de sus habitantes derretía el gélido clima andino. Ana se ajustó el pesado traje bordado de lentejuelas.",
-              "Pronto, el sonido estridente y majestuoso del latón invadió las calles: cientos de músicos afinaban tubas y trompetas al unísono.",
-              "—Bailamos por devoción, pero nuestros pies golpean la tierra de forma visceral para agradecer el inicio del ciclo agrícola —le recordó su madre.",
-              "Al unirse al caudal humano de danzarines, Ana experimentó una conexión trascendental con sus raíces.",
-              "La fatiga muscular de danzar durante horas en la altitud se desvanecía mágicamente, reemplazada por la energía colectiva de un pueblo unido por una identidad cultural desbordante."
-            ],
-            culture: {
-              date: "Febrero",
-              origin: "Culto católico a la Virgen María y reverencia prehispánica a la tierra y las montañas (Apus)",
-              elements: ["Danzas (Morenada, Caporales)", "Trajes luminosos", "Concursos folclóricos", "Bandas de bronces"],
-              meaning: "La mayor manifestación cultural, musical y dancística de Perú y de Sudamérica.",
-              gallery: [
-                "https://images.unsplash.com/photo-1587595431973-125d050c2628?auto=format&fit=crop&w=800&q=80",
-                "https://images.unsplash.com/photo-1516053351239-0d3f82522c06?auto=format&fit=crop&w=800&q=80"  
-              ],
-              videos: [
-                { title: "Pasacalle de la Candelaria en Puno", url: "https://www.youtube.com/results?search_query=pasacalle+virgen+candelaria+puno" },
-                { title: "¿Cómo se elaboran los trajes de luces?", url: "https://www.youtube.com/results?search_query=confeccion+trajes+de+luces+puno" }
-              ]
-            },
-            keywords: [
-              { word: "frío", translation: "cold" },
-              { word: "traje", translation: "costume / suit" },
-              { word: "latón", translation: "brass (musical instruments)" },
-              { word: "inquebrantable", translation: "unbreakable / unwavering" },
-              { word: "visceral", translation: "visceral / deep-rooted" },
-              { word: "trascendental", translation: "transcendental / highly significant" }
-            ],
-            activities: [
-              "Analiza el uso de adjetivos en el texto (ej. fervor inquebrantable, conexión trascendental). ¿Qué efecto producen en el lector?",
-              "¿De qué manera el clima 'gélido' contrasta con la actitud y las acciones de los participantes?",
-              "Explora el concepto de 'energía colectiva' mencionado en el relato. ¿Cómo influye la música comunitaria de los instrumentos de latón en esta energía?"
-            ],
-            image: "https://images.unsplash.com/photo-1614798670295-a1f33f0e1596?auto=format&fit=crop&w=1000&q=80"
-          },
-          {
-            id: 9,
-            title: "Semana Santa",
-            country: "España",
-            vocabLevel: "Nivel Avanzado",
-            storyTitle: "Penitencia y saetas",
-            story: [
-              "Las laberínticas calles de Sevilla estaban inmersas en una solemnidad abrumadora. El denso aroma del incienso se mezclaba con el perfume de los naranjos, creando una atmósfera casi mística.",
-              "Carlos, habituado al ruido urbano, quedó petrificado ante el silencio sepulcral de las multitudes congregadas.",
-              "Lentamente, la monumental figura de madera, iluminada únicamente por cirios parpadeantes, dobló la esquina portada por los costaleros. Su penitencia y esfuerzo físico eran titánicos.",
-              "De pronto, desde un balcón sumido en la oscuridad, la voz desgarradora de una mujer rompió la noche cantando una 'saeta'. Era un quejido flamenco rebosante de devoción.",
-              "Carlos comprendió entonces que la cultura española poseía la capacidad única de encontrar una belleza estética estremecedora en el dolor y el luto religioso."
-            ],
-            culture: {
-              date: "Entre marzo y abril (depende del calendario lunar)",
-              origin: "Prácticas de piedad de la Iglesia Católica durante la Edad Media",
-              elements: ["Procesiones", "Pasos (figuras esculpidas)", "Nazarenos y costaleros", "Saetas"],
-              meaning: "Conmemoración solemne de los últimos días de la vida de Jesús; manifestación de arte sacro.",
-              gallery: [
-                "https://images.unsplash.com/photo-1587127926105-950c4bbcb8e8?auto=format&fit=crop&w=800&q=80",
-                "https://images.unsplash.com/photo-1555581109-170df63a5df6?auto=format&fit=crop&w=800&q=80"  
-              ],
-              videos: [
-                { title: "El misterio de la Madrugá Sevillana", url: "https://www.youtube.com/results?search_query=madruga+semana+santa+sevilla+documental" },
-                { title: "Escuchando una Saeta en vivo", url: "https://www.youtube.com/results?search_query=canto+de+saeta+semana+santa" }
-              ]
-            },
-            keywords: [
-              { word: "silencio", translation: "silence" },
-              { word: "vela", translation: "candle" },
-              { word: "procesión", translation: "procession" },
-              { word: "penitencia", translation: "penance / atonement" },
-              { word: "solemne", translation: "solemn" },
-              { word: "saeta", translation: "flamenco-style prayer song" }
-            ],
-            activities: [
-              "¿Qué elementos sensoriales (olores, sonidos, luces) utiliza el autor para describir la 'atmósfera mística' de Sevilla?",
-              "Define con tus palabras qué es una 'saeta' basándote en el contexto del relato.",
-              "Debate IB (Creencias y Valores): Reflexiona sobre por qué los humanos realizan actos de 'penitencia' física extrema como forma de demostración espiritual."
-            ],
-            image: "https://images.unsplash.com/photo-1554189097-ffe88e998a2b?auto=format&fit=crop&w=1000&q=80"
-          },
-          {
-            id: 10,
-            title: "Día de la Independencia",
-            country: "Guinea Ecuatorial",
-            vocabLevel: "Nivel Avanzado",
-            storyTitle: "Ecos de dos mundos",
-            story: [
-              "El sofocante clima tropical envolvía la capital, Malabo. Marta agitaba con vehemencia una pequeña bandera tricolor mientras aguardaba el inicio del majestuoso desfile civil.",
-              "—Es imperativo recordar el precio de nuestra soberanía —le susurró su abuelo, evocando los duros tiempos previos a la emancipación de 1968.",
-              "Lo que más fascinaba a Marta era la sinfonía de contrastes. Las órdenes militares resonaban en un impecable español, el idioma oficial que amalgamaba al país, pero los cánticos de libertad vibraban en lenguas vernáculas como el fang y el bubi.",
-              "Ese día no era un mero trámite político.",
-              "Era la apoteósica celebración de una identidad poscolonial compleja: una nación anclada en el corazón de África, pero inextricablemente ligada al patrimonio lingüístico hispanohablante."
-            ],
-            culture: {
-              date: "12 de octubre",
-              origin: "Emancipación y fin del dominio colonial de España en 1968",
-              elements: ["Desfiles cívico-militares", "Danzas tradicionales", "Discursos políticos", "Bilingüismo africano e hispano"],
-              meaning: "Celebra la autodeterminación del único país soberano de África cuyo idioma oficial primario es el español.",
-              gallery: [
-                "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?auto=format&fit=crop&w=800&q=80",
-                "https://images.unsplash.com/photo-1528642474498-1af0c17fd8c3?auto=format&fit=crop&w=800&q=80"  
-              ],
-              videos: [
-                { title: "Historia Breve de Guinea Ecuatorial", url: "https://www.youtube.com/results?search_query=independencia+guinea+ecuatorial+historia" },
-                { title: "El Español en África", url: "https://www.youtube.com/results?search_query=el+español+en+guinea+ecuatorial+documental" }
-              ]
-            },
-            keywords: [
-              { word: "bandera", translation: "flag" },
-              { word: "idioma", translation: "language" },
-              { word: "soberanía", translation: "sovereignty / self-rule" },
-              { word: "emancipación", translation: "emancipation / liberation" },
-              { word: "vernáculo", translation: "vernacular / native (language)" },
-              { word: "poscolonial", translation: "post-colonial" }
-            ],
-            activities: [
-              "¿A qué se refiere el abuelo cuando habla del 'precio de nuestra soberanía'?",
-              "El texto destaca el contraste de idiomas durante el desfile. ¿Qué lenguas se mencionan y qué función cumple cada una en la identidad del país?",
-              "Investigación IB: Guinea Ecuatorial es el único país hispanohablante de África. Escribe un párrafo analizando cómo este hecho histórico influye en su cultura moderna."
-            ],
-            image: "https://images.unsplash.com/photo-1531259275498-e7e0e74f00ee?auto=format&fit=crop&w=1000&q=80"
-          },
-          {
-            id: 11,
-            title: "Feria de las Flores",
-            country: "Colombia",
-            vocabLevel: "Nivel Avanzado",
-            storyTitle: "El peso de la resiliencia",
-            story: [
-              "El rústico armazón de madera a la espalda de Tomás superaba los setenta kilos. Estaba recubierto por una exquisita filigrana de orquídeas y pompones, formando un deslumbrante tapiz vivo.",
-              "—¡Fuerza! No cargas simples flores, portas el incalculable honor de Antioquia —lo alentó su abuelo, veterano de la escarpada región de Santa Elena.",
-              "Al desfilar por las avenidas de Medellín, bajo los vítores ensordecedores del público, Tomás comprendió la trascendencia de aquella 'silleta'.",
-              "Históricamente, los campesinos no empleaban estos armazones como ornamentos festivos, sino como herramientas indispensables para transportar víveres y enfermos a través de la topografía intransitable de los Andes.",
-              "A pesar del agudo tormento físico, Tomás sintió que el desfile era una majestuosa oda al patrimonio inmaterial y a la resiliencia de un pueblo forjado en la perseverancia."
-            ],
-            culture: {
-              date: "Agosto",
-              origin: "Iniciada en 1957 para homenajear el trabajo y la cultura de los floricultores de Antioquia",
-              elements: ["Desfile de Silleteros", "Trovas (poesía cantada)", "Exposiciones de orquídeas"],
-              meaning: "Exalta la cultura campesina local, la abundante biodiversidad floral y la superación de obstáculos.",
-              gallery: [
-                "https://images.unsplash.com/photo-1563241527-300ecb113915?auto=format&fit=crop&w=800&q=80",
-                "https://images.unsplash.com/photo-1612438214708-f428a707dd4e?auto=format&fit=crop&w=800&q=80"  
-              ],
-              videos: [
-                { title: "La tradición milenaria del Silletero", url: "https://www.youtube.com/results?search_query=historia+origen+silleteros+medellin" },
-                { title: "Resumen del Desfile de Silleteros", url: "https://www.youtube.com/results?search_query=desfile+silleteros+feria+flores+medellin" }
-              ]
-            },
-            keywords: [
-              { word: "flor", translation: "flower" },
-              { word: "esfuerzo", translation: "effort" },
-              { word: "silleta", translation: "wooden back-rack for carrying items" },
-              { word: "filigrana", translation: "filigree / intricate design" },
-              { word: "patrimonio", translation: "heritage" },
-              { word: "resiliencia", translation: "resilience / toughness" }
-            ],
-            activities: [
-              "¿Cuál era el uso histórico, estrictamente funcional, de la 'silleta' en las montañas de los Andes?",
-              "El autor utiliza la frase 'oda al patrimonio inmaterial'. ¿Qué significa 'patrimonio inmaterial' en el contexto de la cultura?",
-              "La resiliencia es la capacidad de superar circunstancias difíciles. Basado en la historia de los silleteros, ¿cómo se ilustra esta resiliencia?"
-            ],
-            image: "https://images.unsplash.com/photo-1508611116120-72cb612a2a07?auto=format&fit=crop&w=1000&q=80"
-          }
+            {
+                id: 3,
+                title: "Feria de Abril",
+                location: "Sevilla, Andalucía",
+                date: "Dos semanas después de Semana Santa",
+                category: "Cultural",
+                summary: "El alma andaluza se viste de flamenca, farolillos y casetas con el sonar de guitarras y el galope elegante de los caballos.",
+                content: "Nacida originalmente en 1847 como una feria ganadera mercantil por iniciativa de dos empresarios (un catalán y un vasco), la Feria de Abril evolucionó rápidamente hacia una colorida celebración social. El imponente recinto de el 'Real' se adorna con miles de farolillos de colores y alberga más de mil casetas particulares y públicas donde se degusta pescaito frito, se brinda con rebujito y se bailan sevillanas hasta el amanecer.",
+                image: "https://images.unsplash.com/photo-1543783207-ec64e4d95325?auto=format&fit=crop&w=1200&q=80"
+            }
         ];
 
         function App() {
-          const [appData, setAppData] = useState(initialBookData);
-          const [isEditMode, setIsEditMode] = useState(false);
-          const [editModal, setEditModal] = useState({ isOpen: false, chapterId: null, type: '', index: 0, currentUrl: '', tempUrl: '' });
-          const [previewError, setPreviewError] = useState(false);
-          const [currentView, setCurrentView] = useState('cover'); // 'cover', 'toc', 'chapter', 'print'
-          const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
-          const [activeTab, setActiveTab] = useState('story'); // 'story', 'culture', 'activities'
-          
-          // State to store student answers
-          const [studentAnswers, setStudentAnswers] = useState({});
+            // Default Cover setup with the local name 'spanish-city.jpg' as requested
+            const [coverImage, setCoverImage] = useState('spanish-city.jpg');
+            const [chapters, setChapters] = useState(defaultChapters);
+            const [selectedChapter, setSelectedChapter] = useState(null);
+            const [searchQuery, setSearchQuery] = useState('');
+            const [filterCategory, setFilterCategory] = useState('Todas');
+            
+            // New Chapter Creator state
+            const [isAdding, setIsAdding] = useState(false);
+            const [newTitle, setNewTitle] = useState('');
+            const [newLocation, setNewLocation] = useState('');
+            const [newDate, setNewDate] = useState('');
+            const [newCategory, setNewCategory] = useState('Popular');
+            const [newSummary, setNewSummary] = useState('');
+            const [newContent, setNewContent] = useState('');
+            const [newImage, setNewImage] = useState('');
 
-          const handleAnswerChange = (chapterId, questionIndex, value) => {
-            setStudentAnswers(prev => ({
-              ...prev,
-              [chapterId]: {
-                ...(prev[chapterId] || {}),
-                [questionIndex]: value
-              }
-            }));
-          };
+            // Edit Modal State precisely matching user's snippets
+            const [editModal, setEditModal] = useState({
+                isOpen: false,
+                chapterId: null,
+                type: '', // 'cover' or 'chapter'
+                index: 0,
+                currentUrl: '',
+                tempUrl: ''
+            });
+            const [previewError, setPreviewError] = useState(false);
 
-          const goToChapter = (index) => {
-            setCurrentChapterIndex(index);
-            setActiveTab('story');
-            setCurrentView('chapter');
-            window.scrollTo(0, 0);
-          };
-
-          const nextChapter = () => {
-            if (currentChapterIndex < appData.length - 1) {
-              goToChapter(currentChapterIndex + 1);
-            }
-          };
-
-          const prevChapter = () => {
-            if (currentChapterIndex > 0) {
-              goToChapter(currentChapterIndex - 1);
-            } else {
-              setCurrentView('toc');
-            }
-          };
-
-          const handleSaveImageUrl = () => {
-            setAppData(prev => prev.map(ch => {
-              if (ch.id === editModal.chapterId) {
+            // Handler to save the customized image URL
+            const handleSaveImageUrl = () => {
                 if (editModal.type === 'cover') {
-                  return { ...ch, image: editModal.tempUrl };
-                } else if (editModal.type === 'gallery') {
-                  const newGallery = [...ch.culture.gallery];
-                  newGallery[editModal.index] = editModal.tempUrl;
-                  return { ...ch, culture: { ...ch.culture, gallery: newGallery } };
+                    setCoverImage(editModal.tempUrl);
+                } else if (editModal.type === 'chapter') {
+                    setChapters(prev => prev.map(ch => 
+                        ch.id === editModal.chapterId ? { ...ch, image: editModal.tempUrl } : ch
+                    ));
                 }
-              }
-              return ch;
-            }));
-            setEditModal({ isOpen: false, chapterId: null, type: '', index: 0, currentUrl: '', tempUrl: '' });
-            setPreviewError(false);
-          };
+                setEditModal({ isOpen: false, chapterId: null, type: '', index: 0, currentUrl: '', tempUrl: '' });
+                setPreviewError(false);
+            };
 
-          // Helper para asignar color según nivel de vocabulario
-          const getLevelColor = (level) => {
-            if(level.includes('Inicial')) return 'bg-green-100 text-green-800 border-green-200';
-            if(level.includes('Intermedio')) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-            return 'bg-purple-100 text-purple-800 border-purple-200';
-          };
+            const addNewChapter = (e) => {
+                e.preventDefault();
+                if (!newTitle || !newSummary) return;
 
-          if (currentView === 'print') {
+                const freshChapter = {
+                    id: Date.now(),
+                    title: newTitle,
+                    location: newLocation || "España",
+                    date: newDate || "Fecha variable",
+                    category: newCategory,
+                    summary: newSummary,
+                    content: newContent || "Historia por escribir...",
+                    image: newImage || "https://images.unsplash.com/photo-1509840144521-176eb5c300f9?auto=format&fit=crop&w=1200&q=80"
+                };
+
+                setChapters([freshChapter, ...chapters]);
+                setIsAdding(false);
+                setNewTitle('');
+                setNewLocation('');
+                setNewDate('');
+                setNewCategory('Popular');
+                setNewSummary('');
+                setNewContent('');
+                setNewImage('');
+            };
+
+            const deleteChapter = (id) => {
+                if (confirm('¿Estás seguro de que deseas eliminar este capítulo festivo?')) {
+                    setChapters(chapters.filter(ch => ch.id !== id));
+                    if (selectedChapter && selectedChapter.id === id) {
+                        setSelectedChapter(null);
+                    }
+                }
+            };
+
+            const filteredChapters = chapters.filter(ch => {
+                const matchesSearch = ch.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                     ch.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                     ch.summary.toLowerCase().includes(searchQuery.toLowerCase());
+                const matchesCategory = filterCategory === 'Todas' || ch.category === filterCategory;
+                return matchesSearch && matchesCategory;
+            });
+
             return (
-              <div className="bg-white text-black min-h-screen font-serif pb-20">
-                <div className="max-w-4xl mx-auto p-8">
-                  
-                  <div className="text-center mb-10 pb-6 border-b-4 border-slate-900 print:hidden bg-slate-50 p-6 rounded-xl">
-                     <Printer size={48} className="mx-auto mb-4 text-slate-700" />
-                     <h2 className="text-3xl font-bold mb-4 font-sans text-slate-800">Modo Cuaderno de Trabajo</h2>
-                     <p className="mb-6 font-sans text-slate-600 max-w-2xl mx-auto">
-                       Utiliza la opción de impresión de tu navegador para guardar este documento como PDF o imprimirlo en papel.
-                     </p>
-                     <div className="flex justify-center gap-4">
-                       <button
-                         onClick={() => window.print()}
-                         className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-lg font-bold shadow-lg transition"
-                       >
-                         Imprimir Documento
-                       </button>
-                       <button
-                         onClick={() => setCurrentView('cover')}
-                         className="bg-white border-2 border-slate-300 text-slate-700 hover:bg-slate-100 px-8 py-3 rounded-lg font-bold transition"
-                       >
-                         Volver al Libro
-                       </button>
-                     </div>
-                  </div>
+                <div className="min-h-screen flex flex-col justify-between">
+                    
+                    {/* Header Banner Section */}
+                    <header className="relative bg-slate-950 text-white min-h-[500px] flex items-center overflow-hidden print:min-h-fit print:bg-white print:text-black">
+                        {/* Background Image using the user's spanish-city.jpg */}
+                        <div className="absolute inset-0 z-0 print:hidden">
+                            <img 
+                                src={coverImage} 
+                                alt="Spanish Cityscape" 
+                                className="w-full h-full object-cover opacity-45 transform scale-105 transition-all duration-700"
+                                onError={(e) => {
+                                    // Fallback to Unsplash if local file is missing during current edit
+                                    e.target.src = "https://images.unsplash.com/photo-1543783207-ec64e4d95325?auto=format&fit=crop&w=1920&q=80";
+                                }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-slate-900/40"></div>
+                        </div>
 
-                  <div className="print-content">
-                    <div className="text-center mb-16 pt-8">
-                      <h1 className="text-5xl font-extrabold mb-4 uppercase tracking-widest font-sans">Fiestas que cuentan historias</h1>
-                      <p className="text-2xl italic text-slate-700 mb-2">Un viaje cultural por el mundo hispanohablante</p>
-                      <p className="text-xl font-bold border-t-2 border-b-2 border-black inline-block py-2 px-6 mt-4 font-sans">Cuaderno de Comprensión y Reflexión (IB)</p>
-                      <div className="mt-16 flex flex-col items-start w-1/2 mx-auto gap-4 font-sans">
-                        <div className="w-full flex border-b-2 border-black pb-1"><span className="font-bold mr-4">Nombre:</span> </div>
-                        <div className="w-full flex border-b-2 border-black pb-1"><span className="font-bold mr-4">Fecha:</span> </div>
-                      </div>
-                    </div>
-
-                    {appData.map((chapter, index) => (
-                       <div key={chapter.id} className="mb-24 page-break-after-always">
-                         
-                          <div className="border-l-8 border-slate-800 pl-6 mb-8">
-                            <h2 className="text-4xl font-black uppercase font-sans">
-                              {index + 1}. {chapter.title}
-                            </h2>
-                            <h3 className="text-2xl text-slate-600 italic mt-2 flex items-center gap-2">
-                               {chapter.country} • {chapter.vocabLevel}
-                            </h3>
-                          </div>
-                          
-                          <h4 className="text-2xl font-bold mb-4 font-sans bg-slate-100 p-2 inline-block">Lectura: "{chapter.storyTitle}"</h4>
-                          <div className="text-justify leading-loose text-lg mb-8 space-y-4 pr-4">
-                            {chapter.story.map((p, i) => (
-                              <p key={i} className={p.startsWith('—') ? 'pl-8 italic' : ''}>{p}</p>
-                            ))}
-                          </div>
-
-                          <h4 className="text-xl font-bold mb-4 border-b-2 border-slate-300 pb-2 font-sans">Vocabulario Bilingüe Escalonado</h4>
-                          <div className="grid grid-cols-2 gap-x-8 gap-y-3 mb-10 text-lg bg-slate-50 p-6 border border-slate-200">
-                            {chapter.keywords.map((kw, i) => (
-                              <div key={i} className="flex border-b border-slate-300 border-dotted pb-1 font-sans">
-                                <span className="font-bold w-1/2">{kw.word}</span>
-                                <span className="italic text-slate-600 w-1/2">{kw.translation}</span>
-                              </div>
-                            ))}
-                          </div>
-
-                          <h4 className="text-2xl font-bold mb-6 font-sans bg-slate-100 p-2 inline-block">Actividades de Reflexión (IB)</h4>
-                          <div className="space-y-12">
-                             {chapter.activities.map((act, i) => (
-                                <div key={i} className="mb-12 font-sans">
-                                  <p className="font-bold text-lg mb-6 leading-relaxed">{i + 1}. {act}</p>
-                                  <div className="border-b-2 border-slate-400 mt-10"></div>
-                                  <div className="border-b-2 border-slate-400 mt-10"></div>
-                                  <div className="border-b-2 border-slate-400 mt-10"></div>
-                                  <div className="border-b-2 border-slate-400 mt-10"></div>
+                        {/* Banner Content Container */}
+                        <div className="relative z-10 max-w-6xl mx-auto px-6 py-20 w-full">
+                            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                                <div className="space-y-4 max-w-3xl">
+                                    <span className="inline-block bg-orange-600/90 text-white text-xs font-black tracking-widest uppercase px-3 py-1.5 rounded-full shadow-lg shadow-orange-950/40 print:border print:border-black print:text-black print:bg-white">
+                                        Explora la Cultura Ibérica
+                                    </span>
+                                    <h1 className="text-4xl md:text-6xl font-black font-serif tracking-tight leading-tight">
+                                        Fiestas que cuentan <span className="text-orange-500">historias</span>
+                                    </h1>
+                                    <p className="text-lg md:text-xl text-slate-300 font-serif max-w-2xl leading-relaxed print:text-slate-700">
+                                        Un diario interactivo a través de las tradiciones ancestrales, colores y el alma de las fiestas más emblemáticas de España.
+                                    </p>
                                 </div>
-                             ))}
-                          </div>
-                       </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          }
-
-          if (currentView === 'cover') {
-            return (
-              <div className="min-h-screen bg-orange-50 flex items-center justify-center p-4 font-sans text-slate-800">
-                <div className="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-orange-100">
-                  <div className="md:w-1/2 p-10 md:p-16 flex flex-col justify-center">
-                    <div className="inline-block bg-orange-100 text-orange-800 font-bold px-4 py-1 rounded-full text-xs tracking-widest uppercase mb-6 self-start">
-                      Programa del Diploma IB • Progresión de Vocabulario
-                    </div>
-                    <h1 className="text-5xl md:text-6xl font-extrabold mb-6 leading-tight text-slate-900">
-                      Fiestas que<br/><span className="text-orange-600">cuentan historias</span>
-                    </h1>
-                    <p className="text-lg text-slate-600 mb-10 leading-relaxed">
-                      Descubre la riqueza de nuestras tradiciones. Las lecturas están diseñadas con <span className="font-bold text-orange-800">andamiaje lingüístico</span>: comienzan con vocabulario sencillo y aumentan gradualmente su complejidad.
-                    </p>
-                    <div className="flex flex-col xl:flex-row gap-4">
-                      <button
-                        onClick={() => setCurrentView('toc')}
-                        className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 px-8 rounded-xl transition duration-300 flex items-center justify-center w-full shadow-lg shadow-orange-200"
-                      >
-                        Comenzar Lectura <BookOpen size={20} className="ml-2" />
-                      </button>
-                      <button
-                        onClick={() => setCurrentView('print')}
-                        className="bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-4 px-8 rounded-xl transition duration-300 flex items-center justify-center w-full"
-                      >
-                        Modo Cuaderno <Printer size={20} className="ml-2" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="md:w-1/2 relative bg-orange-200 min-h-[300px] md:min-h-full">
-                     <img
-                       src="https://images.unsplash.com/photo-1518306069926-f76db3163158?auto=format&fit=crop&w=1000&q=80"
-                       alt="Papel picado y festividad"
-                       className="absolute inset-0 w-full h-full object-cover"
-                     />
-                     <div className="absolute inset-0 bg-gradient-to-r from-white via-white/10 to-transparent"></div>
-                  </div>
-                </div>
-              </div>
-            );
-          }
-
-          if (currentView === 'toc') {
-            return (
-              <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 font-sans">
-                <div className="max-w-4xl mx-auto">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-                    <h1 className="text-3xl font-bold text-slate-900">Índice de Celebraciones</h1>
-                    <div className="flex gap-4">
-                       <button
-                         onClick={() => setCurrentView('print')}
-                         className="text-slate-600 hover:text-orange-700 font-bold flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm"
-                       >
-                         <Printer size={18} /> Imprimir Todo
-                       </button>
-                       <button
-                         onClick={() => setCurrentView('cover')}
-                         className="text-orange-600 hover:text-orange-800 font-medium flex items-center gap-2"
-                       >
-                         <ArrowLeft size={20} /> Volver
-                       </button>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
-                    <div className="p-8">
-                      <p className="text-slate-600 mb-8 text-lg">
-                        Selecciona un capítulo. Observa la etiqueta de nivel (Inicial, Intermedio, Avanzado) para conocer la complejidad del vocabulario y gramática utilizada en el relato.
-                      </p>
-                      
-                      <div className="grid md:grid-cols-2 gap-4">
-                        {appData.map((chapter, idx) => (
-                          <button
-                            key={chapter.id}
-                            onClick={() => goToChapter(idx)}
-                            className="flex items-center text-left p-4 rounded-xl border border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition duration-200 group shadow-sm hover:shadow-md relative overflow-hidden"
-                          >
-                            <div className="bg-slate-100 text-slate-600 font-black text-xl h-12 w-12 rounded-xl flex items-center justify-center shrink-0 mr-4 group-hover:bg-orange-600 group-hover:text-white transition">
-                              {idx + 1}
+                                
+                                <button 
+                                    onClick={() => setEditModal({
+                                        isOpen: true,
+                                        chapterId: null,
+                                        type: 'cover',
+                                        index: 0,
+                                        currentUrl: coverImage,
+                                        tempUrl: coverImage
+                                    })}
+                                    className="print:hidden flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-5 py-3 rounded-xl border border-white/20 backdrop-blur-md transition-all font-bold text-sm shadow-md"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 text-orange-400">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                                    </svg>
+                                    Personalizar Portada
+                                </button>
                             </div>
-                            <div className="flex-1">
-                              <h3 className="font-bold text-slate-800 text-lg group-hover:text-orange-700 leading-tight mb-1">{chapter.title}</h3>
-                              <div className="flex flex-wrap items-center gap-2 mt-1">
-                                <span className="text-sm text-slate-500 flex items-center gap-1 font-medium">
-                                  <MapPin size={14} className="text-orange-400" /> {chapter.country}
-                                </span>
-                                <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-md border ${getLevelColor(chapter.vocabLevel)}`}>
-                                  {chapter.vocabLevel}
-                                </span>
-                              </div>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          }
-
-          const chapter = appData[currentChapterIndex];
-
-          return (
-            <div className="min-h-screen bg-slate-50 pb-20 font-sans text-slate-800 relative">
-              
-              {/* Top Navigation Bar */}
-              <div className="bg-white sticky top-0 z-50 border-b border-slate-200 shadow-sm px-4 py-3 flex justify-between items-center">
-                <button
-                  onClick={() => setCurrentView('toc')}
-                  className="text-slate-500 hover:text-orange-600 font-medium flex items-center gap-2 transition bg-slate-50 px-3 py-1.5 rounded-lg"
-                >
-                  <List size={20} /> <span className="hidden sm:inline">Índice</span>
-                </button>
-                <div className="text-center flex flex-col items-center">
-                  <span className="text-xs font-bold uppercase tracking-wider text-orange-500">Capítulo {currentChapterIndex + 1} de {appData.length}</span>
-                  <h2 className="text-sm font-bold text-slate-800 hidden sm:block">{chapter.title}</h2>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <button
-                    onClick={() => setIsEditMode(!isEditMode)}
-                    className={`p-2 rounded-lg transition border flex items-center gap-1 ${isEditMode ? 'bg-orange-600 text-white border-orange-600' : 'text-slate-500 border-transparent hover:border-slate-200 hover:bg-slate-100'}`}
-                    title="Editar Imágenes"
-                  >
-                    <Camera size={18} />
-                    <span className="hidden lg:inline text-sm font-bold">{isEditMode ? 'Edición ON' : 'Editar Imágenes'}</span>
-                  </button>
-                  <div className="w-px h-6 bg-slate-200 mx-1 hidden sm:block"></div>
-                  <button
-                    onClick={prevChapter}
-                    className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition border border-transparent hover:border-slate-200"
-                    title="Capítulo Anterior"
-                  >
-                    <ArrowLeft size={20} />
-                  </button>
-                  <button
-                    onClick={nextChapter}
-                    disabled={currentChapterIndex === appData.length - 1}
-                    className={`p-2 rounded-lg transition border ${currentChapterIndex === appData.length - 1 ? 'text-slate-300 border-transparent cursor-not-allowed' : 'text-orange-600 border-orange-200 hover:bg-orange-50'}`}
-                    title="Siguiente Capítulo"
-                  >
-                    <ArrowRight size={20} />
-                  </button>
-                </div>
-              </div>
-
-              <div className="max-w-7xl mx-auto px-4 mt-8 flex flex-col xl:flex-row gap-8">
-                
-                {/* Left Column: Image & Vocab */}
-                <div className="xl:w-1/3 flex flex-col gap-6">
-                  {/* Main Hero Image */}
-                  <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-100">
-                    <div className="relative h-64 xl:h-80 group">
-                      <img
-                        src={chapter.image}
-                        alt={chapter.title}
-                        className="absolute inset-0 w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6">
-                        <div className="flex items-center text-orange-400 font-bold mb-2 gap-2 text-sm tracking-wide uppercase">
-                          <span className="flex items-center gap-1"><MapPin size={16} /> {chapter.country}</span>
-                          <span className="opacity-50">•</span>
-                          <span className={`px-2 py-0.5 rounded text-[10px] ${getLevelColor(chapter.vocabLevel)}`}>{chapter.vocabLevel}</span>
                         </div>
-                        <h1 className="text-3xl font-extrabold text-white leading-tight">
-                          {chapter.title}
-                        </h1>
-                      </div>
-                      {isEditMode && (
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                          <button
-                            onClick={() => setEditModal({ isOpen: true, chapterId: chapter.id, type: 'cover', index: 0, currentUrl: chapter.image, tempUrl: chapter.image })}
-                            className="bg-orange-600 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 shadow-lg hover:bg-orange-700 transition"
-                          >
-                            <ImageIcon size={18} /> Cambiar Portada
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                    </header>
 
-                  {/* Interactive Vocabulary Widget */}
-                  <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 sticky top-24">
-                      <h4 className="text-sm font-black uppercase text-slate-800 mb-4 tracking-widest flex items-center justify-between border-b border-slate-100 pb-2">
-                        <span className="flex items-center gap-2"><TrendingUp size={16} className="text-orange-500" /> Glosario Escalonado</span>
-                        <Globe size={16} className="text-slate-400"/>
-                      </h4>
-                      <p className="text-xs text-slate-500 mb-4 italic">Pasa el ratón (hover) sobre cada palabra para ver su traducción al inglés.</p>
-                      <div className="flex flex-col gap-3">
-                        {chapter.keywords.map((kw, idx) => (
-                          <div key={idx} className="group relative bg-orange-50 border border-orange-200 rounded-lg p-3 hover:bg-orange-600 transition-colors duration-300 cursor-default flex flex-col">
-                            <span className="text-orange-800 font-bold group-hover:text-white transition-colors">{kw.word}</span>
-                            <span className="text-orange-600 text-sm italic mt-1 group-hover:text-orange-100 transition-colors">{kw.translation}</span>
-                          </div>
-                        ))}
-                      </div>
-                  </div>
-                </div>
-
-                {/* Right Column: Interactive Content */}
-                <div className="xl:w-2/3">
-                  <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-100 min-h-[800px] flex flex-col">
-                    
-                    {/* Navigation Tabs */}
-                    <div className="flex border-b border-slate-200 bg-slate-50">
-                      <button
-                        onClick={() => setActiveTab('story')}
-                        className={`flex-1 py-5 px-2 text-center font-bold flex flex-col sm:flex-row items-center justify-center gap-2 transition-colors ${activeTab === 'story' ? 'text-orange-700 bg-white border-t-4 border-t-orange-500' : 'text-slate-500 hover:text-slate-800'}`}
-                      >
-                        <BookOpen size={20} /> <span>El Relato</span>
-                      </button>
-                      <button
-                        onClick={() => setActiveTab('culture')}
-                        className={`flex-1 py-5 px-2 text-center font-bold flex flex-col sm:flex-row items-center justify-center gap-2 transition-colors ${activeTab === 'culture' ? 'text-blue-700 bg-white border-t-4 border-t-blue-500' : 'text-slate-500 hover:text-slate-800'}`}
-                      >
-                        <Globe size={20} /> <span>Contexto Visual</span>
-                      </button>
-                      <button
-                        onClick={() => setActiveTab('activities')}
-                        className={`flex-1 py-5 px-2 text-center font-bold flex flex-col sm:flex-row items-center justify-center gap-2 transition-colors ${activeTab === 'activities' ? 'text-emerald-700 bg-white border-t-4 border-t-emerald-500' : 'text-slate-500 hover:text-slate-800'}`}
-                      >
-                        <Edit3 size={20} /> <span>Análisis / Diario</span>
-                      </button>
-                    </div>
-
-                    {/* Content Area */}
-                    <div className="p-8 sm:p-12 flex-grow bg-white">
-                      
-                      {/* STORY TAB */}
-                      {activeTab === 'story' && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                          <h2 className="text-3xl font-black text-slate-800 mb-8 font-serif">“{chapter.storyTitle}”</h2>
-                          <div className="space-y-6 text-lg text-slate-700 leading-relaxed font-serif">
-                            {chapter.story.map((paragraph, idx) => (
-                              <p key={idx} className={paragraph.startsWith('—') ? 'pl-6 border-l-4 border-orange-300 italic text-slate-600 bg-orange-50/30 py-2' : ''}>
-                                {paragraph}
-                              </p>
-                            ))}
-                          </div>
-                          
-                          <div className="mt-16 flex justify-end">
-                            <button
-                              onClick={() => setActiveTab('culture')}
-                              className="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-3 hover:bg-slate-800 transition shadow-md"
-                            >
-                              Ver Galería de Imágenes <ArrowRight size={18} />
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* CULTURE TAB (Enhanced with Media) */}
-                      {activeTab === 'culture' && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                          
-                          {/* Visual Gallery (Highly contextual images) */}
-                          <div className="mb-10">
-                            <h3 className="font-bold text-xl text-slate-800 mb-4 border-b-2 border-slate-100 pb-2 flex items-center gap-2">
-                               Fotografías de la Celebración
-                            </h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                               {chapter.culture.gallery.map((imgUrl, i) => (
-                                 <div key={i} className="group relative h-56 rounded-xl overflow-hidden shadow-md border border-slate-200">
-                                    <img src={imgUrl} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt={`Contexto visual de ${chapter.title}`}/>
-                                    {isEditMode && (
-                                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                    {/* Main Workspace */}
+                    <main className="max-w-6xl mx-auto px-6 py-12 w-full flex-grow">
+                        
+                        {/* Control Deck (Search, Filter, Add Chapter Buttons) */}
+                        <div className="print:hidden flex flex-col md:flex-row gap-4 items-center justify-between mb-10 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                                <div className="relative">
+                                    <input 
+                                        type="text" 
+                                        placeholder="Buscar fiesta o rincón..." 
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 w-full sm:w-64 bg-slate-50"
+                                    />
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
+                                    </svg>
+                                </div>
+                                <div className="flex gap-1.5 bg-slate-100 p-1 rounded-xl">
+                                    {['Todas', 'Popular', 'Histórica', 'Cultural'].map(cat => (
                                         <button
-                                          onClick={() => setEditModal({ isOpen: true, chapterId: chapter.id, type: 'gallery', index: i, currentUrl: imgUrl, tempUrl: imgUrl })}
-                                          className="bg-orange-600 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 shadow-lg hover:bg-orange-700 transition"
+                                            key={cat}
+                                            onClick={() => setFilterCategory(cat)}
+                                            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${filterCategory === cat ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
                                         >
-                                          <ImageIcon size={18} /> Cambiar Foto {i + 1}
+                                            {cat}
                                         </button>
-                                      </div>
-                                    )}
-                                 </div>
-                               ))}
+                                    ))}
+                                </div>
                             </div>
-                          </div>
 
-                          {/* Facts Grid */}
-                          <div className="grid sm:grid-cols-2 gap-6 mb-10">
-                            <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
-                              <div className="flex items-center gap-3 text-blue-800 mb-3 font-black uppercase text-sm tracking-wider">
-                                <Calendar size={18} className="text-blue-500"/> Fecha
-                              </div>
-                              <p className="text-slate-700 font-medium">{chapter.culture.date}</p>
-                            </div>
-                            <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
-                              <div className="flex items-center gap-3 text-blue-800 mb-3 font-black uppercase text-sm tracking-wider">
-                                <MapPin size={18} className="text-blue-500"/> Origen
-                              </div>
-                              <p className="text-slate-700 font-medium">{chapter.culture.origin}</p>
-                            </div>
-                          </div>
-
-                          <div className="mb-10">
-                            <h3 className="font-bold text-xl text-slate-800 mb-4 border-b-2 border-slate-100 pb-2">Elementos Clave</h3>
-                            <ul className="grid sm:grid-cols-2 gap-4">
-                              {chapter.culture.elements.map((el, idx) => (
-                                <li key={idx} className="flex items-start gap-3 text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
-                                  <CheckCircle2 size={20} className="text-blue-500 shrink-0 mt-0.5" />
-                                  <span className="font-medium">{el}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 text-white shadow-xl mb-10 relative overflow-hidden">
-                            <Info className="absolute -right-4 -top-4 text-slate-700 opacity-50" size={120} />
-                            <h3 className="font-black text-xl mb-3 text-blue-300 relative z-10">Significado Cultural</h3>
-                            <p className="text-lg leading-relaxed relative z-10">{chapter.culture.meaning}</p>
-                          </div>
-
-                          {/* Recommended Videos */}
-                          <div className="mb-10">
-                            <h3 className="font-bold text-xl text-slate-800 mb-4 border-b-2 border-slate-100 pb-2 flex items-center gap-2">
-                               Videos Documentales (YouTube)
-                            </h3>
-                            <div className="flex flex-col gap-3">
-                               {chapter.culture.videos.map((vid, i) => (
-                                 <a key={i} href={vid.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl transition-colors group">
-                                   <div className="flex items-center gap-3">
-                                     <PlayCircle className="text-red-600 group-hover:scale-110 transition-transform" size={24} />
-                                     <span className="font-bold text-red-900">{vid.title}</span>
-                                   </div>
-                                   <ExternalLink className="text-red-400 group-hover:text-red-600" size={18}/>
-                                 </a>
-                               ))}
-                            </div>
-                          </div>
-                          
-                          <div className="flex justify-between border-t border-slate-200 pt-6">
                             <button
-                              onClick={() => setActiveTab('story')}
-                              className="text-slate-500 font-bold flex items-center gap-2 hover:text-slate-800 transition"
+                                onClick={() => setIsAdding(!isAdding)}
+                                className="w-full md:w-auto bg-orange-600 hover:bg-orange-700 text-white font-black px-6 py-3 rounded-xl shadow-lg shadow-orange-100 hover:shadow-orange-200 transition-all text-sm flex items-center justify-center gap-2"
                             >
-                              <ArrowLeft size={18} /> Relato
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                                Añadir Nueva Fiesta
                             </button>
-                            <button
-                              onClick={() => setActiveTab('activities')}
-                              className="bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-3 hover:bg-emerald-700 transition shadow-md"
-                            >
-                              Ir al Diario <ArrowRight size={18} />
-                            </button>
-                          </div>
                         </div>
-                      )}
 
-                      {/* ACTIVITIES TAB */}
-                      {activeTab === 'activities' && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                          <div className="flex justify-between items-start mb-8">
-                             <div>
-                               <h2 className="text-3xl font-black text-slate-800 mb-2 flex items-center gap-3">
-                                 <Edit3 className="text-emerald-500" size={32} /> Análisis y Reflexión
-                               </h2>
-                               <p className="text-slate-500">Puedes escribir tus respuestas aquí o usar el Modo Cuaderno para escribir a mano.</p>
-                             </div>
-                          </div>
+                        {/* Add New Chapter Overlay/Form */}
+                        {isAdding && (
+                            <form onSubmit={addNewChapter} className="print:hidden mb-10 bg-white p-8 rounded-2xl border border-orange-100 shadow-xl shadow-orange-50/50 space-y-6">
+                                <div className="border-b border-slate-100 pb-4">
+                                    <h3 className="text-xl font-black text-slate-800 font-serif">Añadir Nuevo Capítulo Festivo</h3>
+                                    <p className="text-xs text-slate-500">Completa la información para que forme parte del mural.</p>
+                                </div>
 
-                          <div className="space-y-8">
-                            {chapter.activities.map((question, idx) => (
-                              <div key={idx} className="bg-emerald-50/50 p-6 sm:p-8 rounded-2xl border border-emerald-100 shadow-sm">
-                                <label className="block text-slate-800 font-bold mb-4 text-lg">
-                                  <span className="bg-emerald-200 text-emerald-800 w-8 h-8 inline-flex items-center justify-center rounded-full mr-3 text-sm">{idx + 1}</span>
-                                  {question}
-                                </label>
-                                <textarea
-                                  className="w-full bg-white border-2 border-emerald-100 rounded-xl p-5 text-slate-700 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition resize-y min-h-[120px] text-lg leading-relaxed shadow-inner"
-                                  placeholder="Escribe tu análisis aquí..."
-                                  value={studentAnswers[chapter.id]?.[idx] || ""}
-                                  onChange={(e) => handleAnswerChange(chapter.id, idx, e.target.value)}
-                                />
-                              </div>
-                            ))}
-                          </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-black text-slate-600 uppercase tracking-wider">Nombre de la Festividad</label>
+                                        <input 
+                                            type="text" 
+                                            required 
+                                            placeholder="Ej. Feria de San Fermín" 
+                                            value={newTitle}
+                                            onChange={(e) => setNewTitle(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 bg-slate-50 focus:outline-none"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-black text-slate-600 uppercase tracking-wider">Localización</label>
+                                        <input 
+                                            type="text" 
+                                            placeholder="Ej. Pamplona, Navarra" 
+                                            value={newLocation}
+                                            onChange={(e) => setNewLocation(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 bg-slate-50 focus:outline-none"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-black text-slate-600 uppercase tracking-wider">Fecha / Época del Año</label>
+                                        <input 
+                                            type="text" 
+                                            placeholder="Ej. 6 al 14 de Julio" 
+                                            value={newDate}
+                                            onChange={(e) => setNewDate(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 bg-slate-50 focus:outline-none"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-black text-slate-600 uppercase tracking-wider">Categoría</label>
+                                        <select 
+                                            value={newCategory} 
+                                            onChange={(e) => setNewCategory(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 bg-slate-50 focus:outline-none"
+                                        >
+                                            <option value="Popular">Popular</option>
+                                            <option value="Histórica">Histórica</option>
+                                            <option value="Cultural">Cultural</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2 md:col-span-2">
+                                        <label className="text-xs font-black text-slate-600 uppercase tracking-wider">Imagen (URL o nombre de archivo)</label>
+                                        <input 
+                                            type="text" 
+                                            placeholder="Ej: spanish-city.jpg o enlace de Unsplash" 
+                                            value={newImage}
+                                            onChange={(e) => setNewImage(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 bg-slate-50 focus:outline-none"
+                                        />
+                                    </div>
+                                    <div className="space-y-2 md:col-span-2">
+                                        <label className="text-xs font-black text-slate-600 uppercase tracking-wider">Resumen Corto</label>
+                                        <textarea 
+                                            required 
+                                            rows="2"
+                                            placeholder="Introduce una breve introducción sobre la esencia de la fiesta..." 
+                                            value={newSummary}
+                                            onChange={(e) => setNewSummary(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 bg-slate-50 focus:outline-none"
+                                        ></textarea>
+                                    </div>
+                                    <div className="space-y-2 md:col-span-2">
+                                        <label className="text-xs font-black text-slate-600 uppercase tracking-wider">Crónica Completa (Narrativa)</label>
+                                        <textarea 
+                                            rows="4"
+                                            placeholder="Escribe la historia detallada, costumbres, origen y leyendas..." 
+                                            value={newContent}
+                                            onChange={(e) => setNewContent(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 bg-slate-50 focus:outline-none"
+                                        ></textarea>
+                                    </div>
+                                </div>
 
-                          <div className="mt-12 flex flex-col sm:flex-row justify-between items-center bg-slate-900 rounded-2xl p-6 shadow-xl">
-                             <span className="text-sm text-slate-400 italic mb-4 sm:mb-0">Nota: Respuestas guardadas en tu navegador.</span>
-                             
-                             {currentChapterIndex < appData.length - 1 ? (
-                               <button
-                                  onClick={nextChapter}
-                                  className="bg-white hover:bg-slate-100 text-slate-900 font-black py-3 px-8 rounded-xl transition duration-300 flex items-center gap-3"
-                                >
-                                  Siguiente Capítulo <ChevronRight size={20} />
-                                </button>
-                             ) : (
-                                <button
-                                  onClick={() => setCurrentView('toc')}
-                                  className="bg-emerald-500 hover:bg-emerald-400 text-white font-black py-3 px-8 rounded-xl transition duration-300 flex items-center gap-3"
-                                >
-                                  Finalizar Lecturas <CheckCircle2 size={20} />
-                                </button>
-                             )}
-                          </div>
+                                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setIsAdding(false)} 
+                                        className="px-5 py-2.5 text-slate-600 hover:bg-slate-100 rounded-xl transition font-bold"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button 
+                                        type="submit" 
+                                        className="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl transition shadow-lg shadow-orange-100"
+                                    >
+                                        Guardar Entrada
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+
+                        {/* Chapters Showcase Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            
+                            {/* Left Side: Interactive Stories Showcase */}
+                            <div className="md:col-span-2 space-y-8">
+                                <h2 className="text-2xl font-black text-slate-800 font-serif border-b pb-3 border-slate-200 flex items-center justify-between">
+                                    <span>Fiestas Populares y Crónicas</span>
+                                    <span className="text-sm font-sans font-bold text-slate-400">{filteredChapters.length} listadas</span>
+                                </h2>
+
+                                {filteredChapters.length === 0 ? (
+                                    <div className="text-center py-20 bg-white rounded-3xl border border-slate-100">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 text-slate-300 mx-auto mb-4">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008h-.008v-.008z" />
+                                        </svg>
+                                        <p className="text-slate-500 font-serif text-lg">No encontramos crónicas que coincidan con la búsqueda.</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                        {filteredChapters.map(chapter => (
+                                            <article key={chapter.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+                                                <div>
+                                                    <div className="relative h-48 overflow-hidden bg-slate-200">
+                                                        <img 
+                                                            src={chapter.image} 
+                                                            alt={chapter.title} 
+                                                            className="w-full h-full object-cover"
+                                                            onError={(e) => {
+                                                                e.target.src = "https://images.unsplash.com/photo-1509840144521-176eb5c300f9?auto=format&fit=crop&w=800&q=80";
+                                                            }}
+                                                        />
+                                                        <div className="absolute top-3 right-3 flex gap-1.5">
+                                                            <button 
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setEditModal({
+                                                                        isOpen: true,
+                                                                        chapterId: chapter.id,
+                                                                        type: 'chapter',
+                                                                        index: 0,
+                                                                        currentUrl: chapter.image,
+                                                                        tempUrl: chapter.image
+                                                                    });
+                                                                }}
+                                                                className="p-2 bg-white/95 hover:bg-white text-slate-700 rounded-full shadow-md transition-all"
+                                                                title="Cambiar Imagen"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+                                                                </svg>
+                                                            </button>
+                                                            <button 
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    deleteChapter(chapter.id);
+                                                                }}
+                                                                className="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-full shadow-md transition-all"
+                                                                title="Eliminar Entrada"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                        <span className="absolute bottom-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] tracking-widest font-black uppercase px-2.5 py-1 rounded">
+                                                            {chapter.category}
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="p-6 space-y-3">
+                                                        <div className="flex items-center gap-2 text-xs text-orange-600 font-bold">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25s-7.5-4.108-7.5-11.25gA7.5 7.5 0 1119.5 10.5z" />
+                                                            </svg>
+                                                            {chapter.location}
+                                                        </div>
+                                                        <h3 className="text-xl font-bold font-serif text-slate-800 leading-snug">{chapter.title}</h3>
+                                                        <p className="text-slate-500 text-xs italic">{chapter.date}</p>
+                                                        <p className="text-slate-600 text-sm leading-relaxed line-clamp-3">{chapter.summary}</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="p-6 pt-0 border-t border-slate-50 mt-4">
+                                                    <button 
+                                                        onClick={() => setSelectedChapter(chapter)}
+                                                        className="w-full text-center bg-slate-100 hover:bg-orange-600 hover:text-white text-slate-700 font-bold text-xs py-3 rounded-xl transition"
+                                                    >
+                                                        Leer Crónica Completa
+                                                    </button>
+                                                </div>
+                                            </article>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Right Side: Chapter Details & Information */}
+                            <div className="space-y-6">
+                                <h2 className="text-2xl font-black text-slate-800 font-serif border-b pb-3 border-slate-200">
+                                    Bitácora de Lectura
+                                </h2>
+
+                                {selectedChapter ? (
+                                    <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm space-y-6">
+                                        <div className="relative h-56 rounded-xl overflow-hidden bg-slate-100">
+                                            <img 
+                                                src={selectedChapter.image} 
+                                                alt={selectedChapter.title} 
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    e.target.src = "https://images.unsplash.com/photo-1509840144521-176eb5c300f9?auto=format&fit=crop&w=800&q=80";
+                                                }}
+                                            />
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <span className="text-xs font-black tracking-widest uppercase bg-orange-100 text-orange-700 px-2.5 py-1 rounded">
+                                                {selectedChapter.category}
+                                            </span>
+                                            <h3 className="text-3xl font-black font-serif text-slate-800 tracking-tight leading-tight">
+                                                {selectedChapter.title}
+                                            </h3>
+                                            
+                                            <div className="space-y-1.5 text-xs text-slate-500 border-l-2 border-slate-200 pl-3">
+                                                <p className="font-bold text-slate-700">📍 {selectedChapter.location}</p>
+                                                <p>📅 {selectedChapter.date}</p>
+                                            </div>
+
+                                            <p className="text-slate-600 font-serif leading-relaxed italic border-t border-b py-4 border-slate-100">
+                                                "{selectedChapter.summary}"
+                                            </p>
+
+                                            <div className="text-slate-700 font-serif leading-relaxed text-sm space-y-4 whitespace-pre-line pt-2">
+                                                {selectedChapter.content}
+                                            </div>
+                                        </div>
+
+                                        <div className="flex justify-between gap-4 pt-6 border-t border-slate-100">
+                                            <button 
+                                                onClick={() => window.print()} 
+                                                className="flex-1 flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition text-xs"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.844l-.278-.052A4.5 4.5 0 0013.5 16.75h3.812a3.375 3.375 0 003.375-3.375V11.25M6.72 13.844a4.5 4.5 0 011.83-3.235l.006-.005a4.503 4.503 0 015.346.005h0a4.5 4.5 0 011.61 3.233M19.5 10.5a7.5 7.5 0 11-15 0V7.5a3 3 0 013-3h9a3 3 0 013 3v3z" />
+                                                </svg>
+                                                Imprimir Relato
+                                            </button>
+                                            <button 
+                                                onClick={() => setSelectedChapter(null)}
+                                                className="flex-1 text-center border border-slate-200 hover:bg-slate-50 text-slate-500 font-bold py-3 rounded-xl transition text-xs"
+                                            >
+                                                Cerrar Diario
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="bg-slate-100 border-2 border-dashed border-slate-200 p-8 rounded-2xl text-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-12 h-12 text-slate-400 mx-auto mb-4">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                                        </svg>
+                                        <h4 className="font-serif font-black text-slate-700 text-lg mb-1">Sin lectura seleccionada</h4>
+                                        <p className="text-slate-500 text-xs leading-relaxed">Elige cualquier crónica festiva del listado para adentrarte en su folclor e historia.</p>
+                                    </div>
+                                )}
+                            </div>
+
                         </div>
-                      )}
-                    </div>
-                  </div>
+                    </main>
+
+                    {/* Simple Decorative Footer */}
+                    <footer className="bg-slate-900 text-slate-400 py-8 border-t border-slate-800 text-center text-xs print:hidden">
+                        <p className="font-serif italic text-slate-300">"El pueblo que canta y baila, ahuyenta sus males."</p>
+                        <p className="mt-2 text-slate-500">© 2026 Bitácora Tradicional de España. Creado con fines culturales.</p>
+                    </footer>
+
+                    {/* Interactive Image Edit Modal matching snippet logic */}
+                    {editModal.isOpen && (
+                        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 print:hidden animate-fade-in">
+                            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-100 space-y-6">
+                                <div className="space-y-1">
+                                    <h3 className="text-xl font-serif font-black text-slate-800">Actualizar Imagen</h3>
+                                    <p className="text-xs text-slate-400">Inserta un enlace web o nombre de archivo de tu repositorio local.</p>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Dirección URL o nombre de recurso</label>
+                                        <input 
+                                            type="text" 
+                                            value={editModal.tempUrl}
+                                            onChange={(e) => {
+                                                setEditModal({ ...editModal, tempUrl: e.target.value });
+                                                setPreviewError(false);
+                                            }}
+                                            placeholder="Introduce el enlace..."
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:outline-none bg-slate-50 text-sm"
+                                        />
+                                    </div>
+
+                                    {/* Real-time Preview */}
+                                    <div className="h-44 rounded-2xl bg-slate-100 overflow-hidden border border-slate-200 flex items-center justify-center relative">
+                                        {editModal.tempUrl ? (
+                                            <img 
+                                                src={editModal.tempUrl} 
+                                                alt="Preview" 
+                                                className="w-full h-full object-cover"
+                                                onError={() => setPreviewError(true)}
+                                            />
+                                        ) : (
+                                            <span className="text-slate-400 font-medium text-xs">Pega un enlace para ver la imagen</span>
+                                        )}
+                                        {previewError && editModal.tempUrl && (
+                                            <div className="absolute inset-0 bg-red-50/90 flex items-center justify-center p-4 text-center">
+                                                <p className="text-red-500 text-xs font-bold leading-relaxed">No se pudo cargar la vista previa. Asegúrate de que la dirección sea correcta o continúa para confirmar.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="flex justify-end gap-3 mt-4">
+                                        <button
+                                            onClick={() => {
+                                                setEditModal({ isOpen: false, chapterId: null, type: '', index: 0, currentUrl: '', tempUrl: '' });
+                                                setPreviewError(false);
+                                            }}
+                                            className="px-6 py-3 text-slate-600 font-bold hover:bg-slate-100 rounded-xl transition"
+                                        >
+                                            Cancelar
+                                        </button>
+                                        <button
+                                            onClick={handleSaveImageUrl}
+                                            disabled={!editModal.tempUrl}
+                                            className={`px-6 py-3 font-black rounded-xl transition shadow-lg ${!editModal.tempUrl ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none' : 'bg-orange-600 text-white hover:bg-orange-700 shadow-orange-200'}`}
+                                        >
+                                            Guardar Imagen
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                 </div>
-              </div>
-
-              {/* Edit Image Modal */}
-              {editModal.isOpen && (
-                <div className="fixed inset-0 bg-slate-900/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-                  <div className="bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-200">
-                    <h3 className="text-2xl font-black mb-2 text-slate-800 flex items-center gap-2">
-                      <Camera className="text-orange-600" size={24} />
-                      Cambiar Imagen
-                    </h3>
-                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
-                      <p className="text-sm text-orange-800 font-medium mb-1">
-                        <strong>Importante:</strong> Debe ser un enlace directo a la imagen.
-                      </p>
-                      <p className="text-xs text-orange-700">
-                        Haz clic derecho sobre cualquier foto en internet y elige <strong>"Copiar dirección de la imagen"</strong>. El enlace suele terminar en <code>.jpg</code> o <code>.png</code>.
-                      </p>
-                    </div>
-
-                    {/* PRESET EXAMPLES TO HELP THE USER */}
-                    <div className="mb-4">
-                       <p className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Prueba con estos ejemplos listos para usar:</p>
-                       <div className="flex gap-2">
-                          <button
-                            onClick={() => {
-                              setEditModal({...editModal, tempUrl: 'https://images.unsplash.com/photo-1518306069926-f76db3163158?auto=format&fit=crop&w=800&q=80'});
-                              setPreviewError(false);
-                            }}
-                            className="text-xs bg-orange-100 hover:bg-orange-200 text-orange-800 px-3 py-2 rounded-lg font-bold transition"
-                          >
-                            Cargar Ejemplo 1
-                          </button>
-                          <button
-                            onClick={() => {
-                              setEditModal({...editModal, tempUrl: 'https://images.unsplash.com/photo-1531259275498-e7e0e74f00ee?auto=format&fit=crop&w=800&q=80'});
-                              setPreviewError(false);
-                            }}
-                            className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-2 rounded-lg font-bold transition"
-                          >
-                            Cargar Ejemplo 2
-                          </button>
-                       </div>
-                    </div>
-                    
-                    <div className="mb-4">
-                      <label className="block text-sm font-bold text-slate-700 mb-2">URL de la Imagen:</label>
-                      <input
-                        type="text"
-                        className={`w-full border-2 rounded-xl p-4 outline-none transition text-slate-700 font-medium ${previewError ? 'border-red-400 focus:ring-4 focus:ring-red-500/20' : 'border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20'}`}
-                        value={editModal.tempUrl}
-                        onChange={(e) => {
-                          setEditModal({...editModal, tempUrl: e.target.value});
-                          setPreviewError(false);
-                        }}
-                        placeholder="https://ejemplo.com/imagen.jpg"
-                        autoFocus
-                      />
-                    </div>
-                    
-                    <div className="mb-6 h-48 rounded-xl border-2 border-dashed border-slate-300 overflow-hidden relative bg-slate-50 flex items-center justify-center">
-                       {editModal.tempUrl ? (
-                         <>
-                           <img
-                              src={editModal.tempUrl}
-                              alt="Vista previa"
-                              className={`absolute inset-0 w-full h-full object-cover shadow-inner ${previewError ? 'hidden' : 'block'}`}
-                              onError={() => setPreviewError(true)}
-                              onLoad={() => setPreviewError(false)}
-                           />
-                           {previewError ? (
-                             <div className="text-center p-4">
-                               <span className="text-red-500 font-bold block mb-1"> Enlace no válido</span>
-                               <span className="text-xs text-slate-500">La imagen no se puede cargar. Asegúrate de copiar la 'dirección de la imagen'.</span>
-                             </div>
-                           ) : (
-                             <span className="bg-white/80 px-3 py-1 rounded-md text-slate-800 font-bold z-10 pointer-events-none shadow-sm backdrop-blur-sm">Vista Previa</span>
-                           )}
-                         </>
-                       ) : (
-                         <span className="text-slate-400 font-medium">Pega un enlace para ver la imagen</span>
-                       )}
-                    </div>
-
-                    <div className="flex justify-end gap-3 mt-4">
-                      <button
-                        onClick={() => {
-                          setEditModal({ isOpen: false, chapterId: null, type: '', index: 0, currentUrl: '', tempUrl: '' });
-                          setPreviewError(false);
-                        }}
-                        className="px-6 py-3 text-slate-600 font-bold hover:bg-slate-100 rounded-xl transition"
-                      >
-                        Cancelar
-                      </button>
-                      <button
-                        onClick={handleSaveImageUrl}
-                        disabled={previewError || !editModal.tempUrl}
-                        className={`px-6 py-3 font-black rounded-xl transition shadow-lg ${previewError || !editModal.tempUrl ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none' : 'bg-orange-600 text-white hover:bg-orange-700 shadow-orange-200'}`}
-                      >
-                        Guardar Imagen
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
+            );
         }
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
