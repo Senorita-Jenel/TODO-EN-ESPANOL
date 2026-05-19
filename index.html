@@ -1,1140 +1,187 @@
-import React, { useState, useEffect } from 'react';
-import { BookOpen, MapPin, Calendar, Info, Edit3, ArrowRight, ArrowLeft, List, Globe, ChevronRight, CheckCircle2, Printer, ExternalLink, PlayCircle, TrendingUp, Camera, ImageIcon } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiestas que cuentan historias</title>
+   
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+   
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <!-- Babel for in-browser JSX compilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-// --- DATA ---
-const initialBookData = [
-  // NIVEL INICIAL (A2-B1)
-  {
-    id: 1,
-    title: "Día de los Muertos",
-    country: "México",
-    vocabLevel: "Nivel Inicial",
-    storyTitle: "Las flores de la memoria",
-    story: [
-      "El olor dulce del pan inundaba la casa. Camila miraba cómo su abuela colocaba una flor naranja, llamada cempasúchil, en el centro de la mesa.",
-      "—Sigo sin entender por qué estamos tan felices si hoy es el día de los muertos —dijo Camila.",
-      "—Porque no es un día triste, mija —respondió la abuela mientras encendía una vela—. Este altar es para recordar a las personas que amamos. Mientras pongamos su comida favorita en esta ofrenda, ellos siempre estarán con nosotros.",
-      "Esa noche, en el cementerio, había música, colores y familias enteras cenando junto a las tumbas de sus difuntos.",
-      "Camila comprendió que en su cultura, la muerte no da miedo; es solo un paso más en el viaje de la vida."
-    ],
-    culture: {
-      date: "1 y 2 de noviembre",
-      origin: "Unión de tradiciones indígenas y catolicismo",
-      elements: ["Ofrendas (altares)", "Flores de cempasúchil", "Pan de muerto", "Papel picado", "Calaveritas"],
-      meaning: "La celebración honra a los difuntos y celebra su retorno temporal al mundo de los vivos.",
-      gallery: [
-        "https://images.unsplash.com/photo-1541434691456-11f8e13f411d?auto=format&fit=crop&w=800&q=80", 
-        "https://images.unsplash.com/photo-1572449043416-55f4685c9bb7?auto=format&fit=crop&w=800&q=80"  
-      ],
-      videos: [
-        { title: "Documental: El significado del Altar", url: "https://www.youtube.com/results?search_query=Dia+de+los+muertos+documental+altar" },
-        { title: "Desfile de Día de Muertos en CDMX", url: "https://www.youtube.com/results?search_query=desfile+dia+de+muertos+cdmx" }
-      ]
-    },
-    keywords: [
-      { word: "flor", translation: "flower" },
-      { word: "vela", translation: "candle" },
-      { word: "recordar", translation: "to remember" },
-      { word: "altar", translation: "altar / shrine" },
-      { word: "difunto", translation: "deceased person" },
-      { word: "ofrenda", translation: "offering (for the altar)" }
-    ],
-    activities: [
-      "¿Por qué la abuela de Camila dice que no es un día triste?",
-      "Busca en el vocabulario la palabra 'ofrenda'. ¿Qué cosas pondrías tú en una ofrenda para alguien importante?",
-      "Compara el ambiente de esta noche en el cementerio con cómo se vive la muerte en tu propia cultura."
-    ],
-    image: "https://images.unsplash.com/photo-1509017174183-0b7e0278f1ec?auto=format&fit=crop&w=1000&q=80"
-  },
-  {
-    id: 2,
-    title: "Las Fallas",
-    country: "España",
-    vocabLevel: "Nivel Inicial",
-    storyTitle: "Cenizas de renovación",
-    story: [
-      "Valeria miraba la enorme figura de madera y cartón en el centro de la plaza. Era un 'ninot', una estatua muy cómica sobre políticos locales.",
-      "—¡Es tan bonita! Es una pena que el fuego la vaya a quemar esta noche —dijo su amigo Lucas, un poco triste.",
-      "—Esa es la idea —explicó Valeria sonriendo—. Las Fallas nos enseñan que tenemos que destruir lo viejo para empezar algo nuevo. El fuego limpia lo obsoleto.",
-      "A la medianoche, comenzó la famosa 'cremà'. Las llamas iluminaron las calles de Valencia y el calor se sentía en las caras de todas las personas.",
-      "Mientras la figura se convertía en cenizas, Valeria pensó en todo lo malo que había pasado ese año, lista para empezar de nuevo."
-    ],
-    culture: {
-      date: "Del 15 al 19 de marzo",
-      origin: "Antigua tradición de carpinteros que quemaban restos de madera en primavera",
-      elements: ["Fallas (monumentos)", "Ninots (figuras)", "La Mascletà (espectáculo sonoro)", "La Cremà (quema)"],
-      meaning: "Celebración que marca el fin del invierno y la purificación a través del fuego.",
-      gallery: [
-        "https://images.unsplash.com/photo-1584285408985-1b4e31885b59?auto=format&fit=crop&w=800&q=80", 
-        "https://images.unsplash.com/photo-1520338801623-6b88fe32bbf2?auto=format&fit=crop&w=800&q=80"  
-      ],
-      videos: [
-        { title: "Así es la Cremà de una Falla Mayor", url: "https://www.youtube.com/results?search_query=la+crema+fallas+valencia" },
-        { title: "¿Qué es una Mascletà?", url: "https://www.youtube.com/results?search_query=mascleta+valencia" }
-      ]
-    },
-    keywords: [
-      { word: "fuego", translation: "fire" },
-      { word: "quemar", translation: "to burn" },
-      { word: "figura", translation: "figure / statue" },
-      { word: "ninot", translation: "satirical figure/doll" },
-      { word: "cenizas", translation: "ashes" },
-      { word: "obsoleto", translation: "obsolete / outdated" }
-    ],
-    activities: [
-      "¿Qué material se usa principalmente para construir las figuras en esta celebración?",
-      "Según Valeria, ¿cuál es el significado profundo de quemar una obra de arte tan bonita?",
-      "Escribe sobre una cosa vieja o 'obsoleta' en tu vida que te gustaría dejar atrás."
-    ],
-    image: "https://images.unsplash.com/photo-1552599299-92b0c9f131a9?auto=format&fit=crop&w=1000&q=80"
-  },
-  {
-    id: 3,
-    title: "Carnaval de Barranquilla",
-    country: "Colombia",
-    vocabLevel: "Nivel Inicial",
-    storyTitle: "El pulso del Caribe",
-    story: [
-      "Mateo se puso su máscara colorida. Hoy era el día grande del carnaval y su grupo, la comparsa, estaba listo para bailar por toda la calle.",
-      "—¡Escucha ese tambor! —le gritó su madre con alegría—. ¡Siente la música en tus pies!",
-      "Mateo empezó a bailar cumbia. A su alrededor había personas disfrazadas de animales africanos, con trajes indígenas y ropas españolas antiguas.",
-      "Todo el mundo reía y bailaba bajo el sol del Caribe. No importaban los problemas de la escuela o de la casa.",
-      "Mateo entendió que esa mezcla de culturas, ese gran mestizaje, era lo que hacía a su ciudad tan especial y feliz."
-    ],
-    culture: {
-      date: "Febrero o marzo (antes del Miércoles de Ceniza)",
-      origin: "Fusión triétnica: indígena, africana y española",
-      elements: ["Batalla de Flores", "Cumbia y Mapalé", "Disfraces (Marimonda, Garabato)"],
-      meaning: "Obra Maestra de la Humanidad (UNESCO); celebra la alegría y la diversidad cultural.",
-      gallery: [
-        "https://images.unsplash.com/photo-1582294157116-2e2e9c1d0f50?auto=format&fit=crop&w=800&q=80", 
-        "https://images.unsplash.com/photo-1560067160-5a3f2b4539b2?auto=format&fit=crop&w=800&q=80"  
-      ],
-      videos: [
-        { title: "La Gran Batalla de Flores", url: "https://www.youtube.com/results?search_query=batalla+de+flores+barranquilla" },
-        { title: "Origen de las danzas del Carnaval", url: "https://www.youtube.com/results?search_query=danzas+tradicionales+carnaval+de+barranquilla" }
-      ]
-    },
-    keywords: [
-      { word: "bailar", translation: "to dance" },
-      { word: "tambor", translation: "drum" },
-      { word: "alegría", translation: "joy / happiness" },
-      { word: "máscara", translation: "mask" },
-      { word: "comparsa", translation: "parade group / troupe" },
-      { word: "mestizaje", translation: "cultural blending" }
-    ],
-    activities: [
-      "¿De qué tres culturas provienen las influencias del Carnaval de Barranquilla?",
-      "Explica cómo se siente Mateo al escuchar el sonido del 'tambor'.",
-      "La palabra 'mestizaje' significa mezcla de culturas. Da un ejemplo de mestizaje en tu país (comida, música, idioma)."
-    ],
-    image: "https://images.unsplash.com/photo-1594119864705-773df4fb4890?auto=format&fit=crop&w=1000&q=80"
-  },
-  
-  // NIVEL INTERMEDIO (B1-B2)
-  {
-    id: 4,
-    title: "Inti Raymi",
-    country: "Perú",
-    vocabLevel: "Nivel Intermedio",
-    storyTitle: "El renacer del Sol",
-    story: [
-      "El viento helado del invierno andino golpeaba la cara de Diego, pero la energía de la multitud en la antigua fortaleza de piedra lo mantenía caliente.",
-      "De pronto, un hombre vestido como el antiguo emperador Sapa Inca alzó sus brazos de oro hacia el cielo para venerar al dios Sol.",
-      "—Abuelo, ¿por qué seguimos haciendo ceremonias de un imperio que desapareció hace siglos? —preguntó Diego.",
-      "—Porque aunque el imperio no exista, la lengua quechua y estas montañas siguen aquí —respondió el abuelo con orgullo—.",
-      "Diego comprendió entonces que la celebración no era solo una obra de teatro. Era la cosmovisión viva de sus ancestros agradeciendo a la tierra por los alimentos recibidos."
-    ],
-    culture: {
-      date: "24 de junio (Solsticio de invierno en el hemisferio sur)",
-      origin: "Ceremonia religiosa del Imperio Incaico",
-      elements: ["Escenificación teatral", "Idioma quechua", "Ofrendas agrícolas", "Música folclórica"],
-      meaning: "Rito de gratitud al dios Sol por las cosechas pasadas y petición de fertilidad para el nuevo ciclo.",
-      gallery: [
-        "https://images.unsplash.com/photo-1587595431973-125d050c2628?auto=format&fit=crop&w=800&q=80", 
-        "https://images.unsplash.com/photo-1542358896-72dc7d38ccb8?auto=format&fit=crop&w=800&q=80"  
-      ],
-      videos: [
-        { title: "Ceremonia Central del Inti Raymi", url: "https://www.youtube.com/results?search_query=inti+raymi+sacsayhuaman+oficial" },
-        { title: "La importancia del Quechua", url: "https://www.youtube.com/results?search_query=importancia+idioma+quechua+peru" }
-      ]
-    },
-    keywords: [
-      { word: "sol", translation: "sun" },
-      { word: "piedra", translation: "stone" },
-      { word: "antiguo", translation: "ancient / old" },
-      { word: "ceremonia", translation: "ceremony" },
-      { word: "venerar", translation: "to venerate / worship" },
-      { word: "cosmovisión", translation: "worldview" }
-    ],
-    activities: [
-      "¿Qué estación del año es en Perú cuando se celebra el Inti Raymi? ¿Por qué es importante para la historia?",
-      "El abuelo menciona que la cultura sigue viva gracias a dos cosas. ¿Cuáles son?",
-      "Usa la palabra 'cosmovisión' para explicar cómo ve el mundo una comunidad indígena que conoces."
-    ],
-    image: "https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&w=1000&q=80"
-  },
-  {
-    id: 5,
-    title: "La Tomatina",
-    country: "España",
-    vocabLevel: "Nivel Intermedio",
-    storyTitle: "Catarsis carmesí",
-    story: [
-      "Para Sofía, viajar hasta un pequeño pueblo en España solo para participar en una guerra de comida parecía una locura total.",
-      "Pero cuando un gran camión apareció en la plaza tirando toneladas de tomates maduros, Sofía olvidó la lógica. Al sonar el cohete, comenzó el desenfreno.",
-      "Tomates volaban por los aires. Ella recibió un golpe suave en el hombro, resbaló en el suelo rojo y estalló en carcajadas junto a turistas de Japón y Australia.",
-      "Cubierta de pulpa de la cabeza a los pies, Sofía sintió una profunda catarsis.",
-      "A veces, descubrió, compartir un momento absurdo y caótico con extraños es la mejor forma de liberar todo el estrés acumulado."
-    ],
-    culture: {
-      date: "Último miércoles de agosto",
-      origin: "Pelea espontánea de jóvenes en 1945",
-      elements: ["Camiones con tomates", "Miles de participantes", "Limpieza comunitaria posterior"],
-      meaning: "Festividad puramente lúdica que fomenta la liberación del estrés y atrae turismo internacional.",
-      gallery: [
-        "https://images.unsplash.com/photo-1558227498-8424263ec8eb?auto=format&fit=crop&w=800&q=80", 
-        "https://images.unsplash.com/photo-1598128558393-70ff21433be0?auto=format&fit=crop&w=800&q=80"  
-      ],
-      videos: [
-        { title: "Dentro de la Batalla de La Tomatina", url: "https://www.youtube.com/results?search_query=la+tomatina+buñol+experiencia" },
-        { title: "El origen curioso de la fiesta", url: "https://www.youtube.com/results?search_query=origen+historia+tomatina+buñol" }
-      ]
-    },
-    keywords: [
-      { word: "calle", translation: "street" },
-      { word: "turista", translation: "tourist" },
-      { word: "locura", translation: "madness / craziness" },
-      { word: "desenfreno", translation: "wildness / lack of control" },
-      { word: "catarsis", translation: "catharsis / emotional release" },
-      { word: "lúdico", translation: "playful / for leisure" }
-    ],
-    activities: [
-      "¿Cómo describe el texto el cambio de actitud de Sofía desde el principio hasta el final del evento?",
-      "En el texto se menciona que turistas de todo el mundo ríen juntos. ¿Qué nos dice esto sobre el lenguaje no verbal?",
-      "Debate ético: La fiesta tiene un espíritu 'lúdico', pero destruye mucha comida. ¿Crees que debería prohibirse? Justifica."
-    ],
-    image: "https://images.unsplash.com/photo-1524850301259-7729d41d11d9?auto=format&fit=crop&w=1000&q=80"
-  },
-  {
-    id: 6,
-    title: "San Fermín",
-    country: "España",
-    vocabLevel: "Nivel Intermedio",
-    storyTitle: "Adrenalina y controversia",
-    story: [
-      "Javier vestía ropa blanca muy limpia y un pañuelo rojo en el cuello. Estaba preparado para correr, pero cuando escuchó el sonido del cohete, o chupinazo, sintió miedo.",
-      "El suelo temblaba. Toros enormes y pesados venían corriendo por la calle estrecha. Su amigo Marcos empezó a correr, pero Javier se detuvo.",
-      "La adrenalina era muy alta, pero la constante controversia sobre el peligro y el trato a los animales invadió su mente.",
-      "En lugar de correr, Javier decidió saltar detrás de la valla de madera para observar desde un lugar seguro.",
-      "Ese día aprendió que decir \"no\" a la presión de sus amigos para mantener sus propios valores también requiere mucha valentía."
-    ],
-    culture: {
-      date: "Del 6 al 14 de julio",
-      origin: "Fiestas en honor a San Fermín combinadas con ferias comerciales de ganado",
-      elements: ["El Chupinazo (cohete)", "Los encierros (correr con toros)", "Vestimenta blanca y roja"],
-      meaning: "Tradición histórica famosa internacionalmente, aunque actualmente centro de debates sobre derechos animales.",
-      gallery: [
-        "https://images.unsplash.com/photo-1582046864459-7170a442a9b4?auto=format&fit=crop&w=800&q=80", 
-        "https://images.unsplash.com/photo-1591485423007-765b40f80b18?auto=format&fit=crop&w=800&q=80"  
-      ],
-      videos: [
-        { title: "El recorrido técnico del encierro", url: "https://www.youtube.com/results?search_query=encierro+san+fermin+calle+estafeta" },
-        { title: "Debate: Cultura vs. Derechos Animales", url: "https://www.youtube.com/results?search_query=debate+tauromaquia+san+fermin" }
-      ]
-    },
-    keywords: [
-      { word: "toro", translation: "bull" },
-      { word: "peligro", translation: "danger" },
-      { word: "correr", translation: "to run" },
-      { word: "valentía", translation: "bravery" },
-      { word: "chupinazo", translation: "rocket marking the start" },
-      { word: "controversia", translation: "controversy" }
-    ],
-    activities: [
-      "¿Qué dos emociones fuertes siente Javier cuando se acercan los animales?",
-      "¿Por qué se dice que hay una 'controversia' sobre esta festividad?",
-      "Javier decidió no correr por sus propios principios. Escribe sobre un momento en el que tú fuiste valiente al ir contra la presión del grupo."
-    ],
-    image: "https://images.unsplash.com/photo-1563804863-718fa6f33230?auto=format&fit=crop&w=1000&q=80"
-  },
-  {
-    id: 7,
-    title: "Carnaval de Oruro",
-    country: "Bolivia",
-    vocabLevel: "Nivel Intermedio",
-    storyTitle: "Máscaras del inframundo",
-    story: [
-      "A cuatro mil metros de altura, a Lucía le costaba respirar. Su máscara de diablo, con grandes cuernos curvos, era muy pesada, pero ella seguía bailando.",
-      "De niña, esos trajes la asustaban mucho. Parecían monstruos de las pesadillas.",
-      "—No son solo demonios —le había explicado su tío—. Muestran el sincretismo de nuestra cultura. Representan la dualidad: bailamos para la Virgen católica, pero nuestros pies tocan la tierra de los espíritus mineros indígenas.",
-      "Rodeada de música fuerte y fuego, Lucía sintió un orgullo profundo al saltar y girar frente al público.",
-      "Al llevar ese traje brillante, ya no sentía miedo. Sentía la fascinante historia y la resistencia de su país en cada movimiento."
-    ],
-    culture: {
-      date: "Febrero o marzo",
-      origin: "Unión de los rituales de la etnia Uru y la devoción católica a la Virgen de la Candelaria",
-      elements: ["La Diablada", "El Tío de la Mina", "Máscaras grotescas", "Bandas de metales"],
-      meaning: "Representa la lucha del bien contra el mal y la dualidad cultural andina.",
-      gallery: [
-        "https://images.unsplash.com/photo-1525286102404-51783cf6a8b6?auto=format&fit=crop&w=800&q=80", 
-        "https://images.unsplash.com/photo-1516053351239-0d3f82522c06?auto=format&fit=crop&w=800&q=80"  
-      ],
-      videos: [
-        { title: "El esplendor de la Diablada de Oruro", url: "https://www.youtube.com/results?search_query=diablada+carnaval+oruro+oficial" },
-        { title: "El mito del Tío de la Mina", url: "https://www.youtube.com/results?search_query=leyenda+el+tio+de+la+mina+bolivia" }
-      ]
-    },
-    keywords: [
-      { word: "pesado", translation: "heavy" },
-      { word: "orgullo", translation: "pride" },
-      { word: "máscara", translation: "mask" },
-      { word: "asustar", translation: "to frighten" },
-      { word: "dualidad", translation: "duality" },
-      { word: "sincretismo", translation: "syncretism (blending of cultures)" }
-    ],
-    activities: [
-      "Busca la palabra 'sincretismo' en el vocabulario. ¿Cómo se ve este concepto reflejado en el traje de Lucía?",
-      "El texto menciona que Lucía baila a 4000 metros de altura. ¿Cómo crees que esto afecta el esfuerzo físico de la celebración?",
-      "¿Qué significado tiene la máscara para Lucía cuando es niña, y cómo cambia ese significado cuando crece?"
-    ],
-    image: "https://images.unsplash.com/photo-1583048995772-2dbfcb2ba722?auto=format&fit=crop&w=1000&q=80"
-  },
+    <style>
+        /* Base typography overrides to match the design */
+        .font-sans { font-family: 'Inter', sans-serif; }
+        .font-serif { font-family: 'Merriweather', serif; }
 
-  // NIVEL AVANZADO (B2-C1)
-  {
-    id: 8,
-    title: "Virgen de la Candelaria",
-    country: "Perú",
-    vocabLevel: "Nivel Avanzado",
-    storyTitle: "Metales en el Altiplano",
-    story: [
-      "La ciudad de Puno despertaba cubierta de escarcha, pero el fervor inquebrantable de sus habitantes derretía el gélido clima andino. Ana se ajustó el pesado traje bordado de lentejuelas.",
-      "Pronto, el sonido estridente y majestuoso del latón invadió las calles: cientos de músicos afinaban tubas y trompetas al unísono.",
-      "—Bailamos por devoción, pero nuestros pies golpean la tierra de forma visceral para agradecer el inicio del ciclo agrícola —le recordó su madre.",
-      "Al unirse al caudal humano de danzarines, Ana experimentó una conexión trascendental con sus raíces.",
-      "La fatiga muscular de danzar durante horas en la altitud se desvanecía mágicamente, reemplazada por la energía colectiva de un pueblo unido por una identidad cultural desbordante."
-    ],
-    culture: {
-      date: "Febrero",
-      origin: "Culto católico a la Virgen María y reverencia prehispánica a la tierra y las montañas (Apus)",
-      elements: ["Danzas (Morenada, Caporales)", "Trajes luminosos", "Concursos folclóricos", "Bandas de bronces"],
-      meaning: "La mayor manifestación cultural, musical y dancística de Perú y de Sudamérica.",
-      gallery: [
-        "https://images.unsplash.com/photo-1587595431973-125d050c2628?auto=format&fit=crop&w=800&q=80", 
-        "https://images.unsplash.com/photo-1516053351239-0d3f82522c06?auto=format&fit=crop&w=800&q=80"  
-      ],
-      videos: [
-        { title: "Pasacalle de la Candelaria en Puno", url: "https://www.youtube.com/results?search_query=pasacalle+virgen+candelaria+puno" },
-        { title: "¿Cómo se elaboran los trajes de luces?", url: "https://www.youtube.com/results?search_query=confeccion+trajes+de+luces+puno" }
-      ]
-    },
-    keywords: [
-      { word: "frío", translation: "cold" },
-      { word: "traje", translation: "costume / suit" },
-      { word: "latón", translation: "brass (musical instruments)" },
-      { word: "inquebrantable", translation: "unbreakable / unwavering" },
-      { word: "visceral", translation: "visceral / deep-rooted" },
-      { word: "trascendental", translation: "transcendental / highly significant" }
-    ],
-    activities: [
-      "Analiza el uso de adjetivos en el texto (ej. fervor inquebrantable, conexión trascendental). ¿Qué efecto producen en el lector?",
-      "¿De qué manera el clima 'gélido' contrasta con la actitud y las acciones de los participantes?",
-      "Explora el concepto de 'energía colectiva' mencionado en el relato. ¿Cómo influye la música comunitaria de los instrumentos de latón en esta energía?"
-    ],
-    image: "https://images.unsplash.com/photo-1614798670295-a1f33f0e1596?auto=format&fit=crop&w=1000&q=80"
-  },
-  {
-    id: 9,
-    title: "Semana Santa",
-    country: "España",
-    vocabLevel: "Nivel Avanzado",
-    storyTitle: "Penitencia y saetas",
-    story: [
-      "Las laberínticas calles de Sevilla estaban inmersas en una solemnidad abrumadora. El denso aroma del incienso se mezclaba con el perfume de los naranjos, creando una atmósfera casi mística.",
-      "Carlos, habituado al ruido urbano, quedó petrificado ante el silencio sepulcral de las multitudes congregadas.",
-      "Lentamente, la monumental figura de madera, iluminada únicamente por cirios parpadeantes, dobló la esquina portada por los costaleros. Su penitencia y esfuerzo físico eran titánicos.",
-      "De pronto, desde un balcón sumido en la oscuridad, la voz desgarradora de una mujer rompió la noche cantando una 'saeta'. Era un quejido flamenco rebosante de devoción.",
-      "Carlos comprendió entonces que la cultura española poseía la capacidad única de encontrar una belleza estética estremecedora en el dolor y el luto religioso."
-    ],
-    culture: {
-      date: "Entre marzo y abril (depende del calendario lunar)",
-      origin: "Prácticas de piedad de la Iglesia Católica durante la Edad Media",
-      elements: ["Procesiones", "Pasos (figuras esculpidas)", "Nazarenos y costaleros", "Saetas"],
-      meaning: "Conmemoración solemne de los últimos días de la vida de Jesús; manifestación de arte sacro.",
-      gallery: [
-        "https://images.unsplash.com/photo-1587127926105-950c4bbcb8e8?auto=format&fit=crop&w=800&q=80", 
-        "https://images.unsplash.com/photo-1555581109-170df63a5df6?auto=format&fit=crop&w=800&q=80"  
-      ],
-      videos: [
-        { title: "El misterio de la Madrugá Sevillana", url: "https://www.youtube.com/results?search_query=madruga+semana+santa+sevilla+documental" },
-        { title: "Escuchando una Saeta en vivo", url: "https://www.youtube.com/results?search_query=canto+de+saeta+semana+santa" }
-      ]
-    },
-    keywords: [
-      { word: "silencio", translation: "silence" },
-      { word: "vela", translation: "candle" },
-      { word: "procesión", translation: "procession" },
-      { word: "penitencia", translation: "penance / atonement" },
-      { word: "solemne", translation: "solemn" },
-      { word: "saeta", translation: "flamenco-style prayer song" }
-    ],
-    activities: [
-      "¿Qué elementos sensoriales (olores, sonidos, luces) utiliza el autor para describir la 'atmósfera mística' de Sevilla?",
-      "Define con tus palabras qué es una 'saeta' basándote en el contexto del relato.",
-      "Debate IB (Creencias y Valores): Reflexiona sobre por qué los humanos realizan actos de 'penitencia' física extrema como forma de demostración espiritual."
-    ],
-    image: "https://images.unsplash.com/photo-1554189097-ffe88e998a2b?auto=format&fit=crop&w=1000&q=80"
-  },
-  {
-    id: 10,
-    title: "Día de la Independencia",
-    country: "Guinea Ecuatorial",
-    vocabLevel: "Nivel Avanzado",
-    storyTitle: "Ecos de dos mundos",
-    story: [
-      "El sofocante clima tropical envolvía la capital, Malabo. Marta agitaba con vehemencia una pequeña bandera tricolor mientras aguardaba el inicio del majestuoso desfile civil.",
-      "—Es imperativo recordar el precio de nuestra soberanía —le susurró su abuelo, evocando los duros tiempos previos a la emancipación de 1968.",
-      "Lo que más fascinaba a Marta era la sinfonía de contrastes. Las órdenes militares resonaban en un impecable español, el idioma oficial que amalgamaba al país, pero los cánticos de libertad vibraban en lenguas vernáculas como el fang y el bubi.",
-      "Ese día no era un mero trámite político.",
-      "Era la apoteósica celebración de una identidad poscolonial compleja: una nación anclada en el corazón de África, pero inextricablemente ligada al patrimonio lingüístico hispanohablante."
-    ],
-    culture: {
-      date: "12 de octubre",
-      origin: "Emancipación y fin del dominio colonial de España en 1968",
-      elements: ["Desfiles cívico-militares", "Danzas tradicionales", "Discursos políticos", "Bilingüismo africano e hispano"],
-      meaning: "Celebra la autodeterminación del único país soberano de África cuyo idioma oficial primario es el español.",
-      gallery: [
-        "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?auto=format&fit=crop&w=800&q=80", 
-        "https://images.unsplash.com/photo-1528642474498-1af0c17fd8c3?auto=format&fit=crop&w=800&q=80"  
-      ],
-      videos: [
-        { title: "Historia Breve de Guinea Ecuatorial", url: "https://www.youtube.com/results?search_query=independencia+guinea+ecuatorial+historia" },
-        { title: "El Español en África", url: "https://www.youtube.com/results?search_query=el+español+en+guinea+ecuatorial+documental" }
-      ]
-    },
-    keywords: [
-      { word: "bandera", translation: "flag" },
-      { word: "idioma", translation: "language" },
-      { word: "soberanía", translation: "sovereignty / self-rule" },
-      { word: "emancipación", translation: "emancipation / liberation" },
-      { word: "vernáculo", translation: "vernacular / native (language)" },
-      { word: "poscolonial", translation: "post-colonial" }
-    ],
-    activities: [
-      "¿A qué se refiere el abuelo cuando habla del 'precio de nuestra soberanía'?",
-      "El texto destaca el contraste de idiomas durante el desfile. ¿Qué lenguas se mencionan y qué función cumple cada una en la identidad del país?",
-      "Investigación IB: Guinea Ecuatorial es el único país hispanohablante de África. Escribe un párrafo analizando cómo este hecho histórico influye en su cultura moderna."
-    ],
-    image: "https://images.unsplash.com/photo-1531259275498-e7e0e74f00ee?auto=format&fit=crop&w=1000&q=80"
-  },
-  {
-    id: 11,
-    title: "Feria de las Flores",
-    country: "Colombia",
-    vocabLevel: "Nivel Avanzado",
-    storyTitle: "El peso de la resiliencia",
-    story: [
-      "El rústico armazón de madera a la espalda de Tomás superaba los setenta kilos. Estaba recubierto por una exquisita filigrana de orquídeas y pompones, formando un deslumbrante tapiz vivo.",
-      "—¡Fuerza! No cargas simples flores, portas el incalculable honor de Antioquia —lo alentó su abuelo, veterano de la escarpada región de Santa Elena.",
-      "Al desfilar por las avenidas de Medellín, bajo los vítores ensordecedores del público, Tomás comprendió la trascendencia de aquella 'silleta'.",
-      "Históricamente, los campesinos no empleaban estos armazones como ornamentos festivos, sino como herramientas indispensables para transportar víveres y enfermos a través de la topografía intransitable de los Andes.",
-      "A pesar del agudo tormento físico, Tomás sintió que el desfile era una majestuosa oda al patrimonio inmaterial y a la resiliencia de un pueblo forjado en la perseverancia."
-    ],
-    culture: {
-      date: "Agosto",
-      origin: "Iniciada en 1957 para homenajear el trabajo y la cultura de los floricultores de Antioquia",
-      elements: ["Desfile de Silleteros", "Trovas (poesía cantada)", "Exposiciones de orquídeas"],
-      meaning: "Exalta la cultura campesina local, la abundante biodiversidad floral y la superación de obstáculos.",
-      gallery: [
-        "https://images.unsplash.com/photo-1563241527-300ecb113915?auto=format&fit=crop&w=800&q=80", 
-        "https://images.unsplash.com/photo-1612438214708-f428a707dd4e?auto=format&fit=crop&w=800&q=80"  
-      ],
-      videos: [
-        { title: "La tradición milenaria del Silletero", url: "https://www.youtube.com/results?search_query=historia+origen+silleteros+medellin" },
-        { title: "Resumen del Desfile de Silleteros", url: "https://www.youtube.com/results?search_query=desfile+silleteros+feria+flores+medellin" }
-      ]
-    },
-    keywords: [
-      { word: "flor", translation: "flower" },
-      { word: "esfuerzo", translation: "effort" },
-      { word: "silleta", translation: "wooden back-rack for carrying items" },
-      { word: "filigrana", translation: "filigree / intricate design" },
-      { word: "patrimonio", translation: "heritage" },
-      { word: "resiliencia", translation: "resilience / toughness" }
-    ],
-    activities: [
-      "¿Cuál era el uso histórico, estrictamente funcional, de la 'silleta' en las montañas de los Andes?",
-      "El autor utiliza la frase 'oda al patrimonio inmaterial'. ¿Qué significa 'patrimonio inmaterial' en el contexto de la cultura?",
-      "La resiliencia es la capacidad de superar circunstancias difíciles. Basado en la historia de los silleteros, ¿cómo se ilustra esta resiliencia?"
-    ],
-    image: "https://images.unsplash.com/photo-1508611116120-72cb612a2a07?auto=format&fit=crop&w=1000&q=80"
-  }
-];
-
-export default function App() {
-  const [appData, setAppData] = useState(initialBookData);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editModal, setEditModal] = useState({ isOpen: false, chapterId: null, type: '', index: 0, currentUrl: '', tempUrl: '' });
-  const [previewError, setPreviewError] = useState(false);
-  const [currentView, setCurrentView] = useState('cover'); // 'cover', 'toc', 'chapter', 'print'
-  const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState('story'); // 'story', 'culture', 'activities'
-  
-  // State to store student answers
-  const [studentAnswers, setStudentAnswers] = useState({});
-
-  const handleAnswerChange = (chapterId, questionIndex, value) => {
-    setStudentAnswers(prev => ({
-      ...prev,
-      [chapterId]: {
-        ...(prev[chapterId] || {}),
-        [questionIndex]: value
-      }
-    }));
-  };
-
-  const goToChapter = (index) => {
-    setCurrentChapterIndex(index);
-    setActiveTab('story');
-    setCurrentView('chapter');
-    window.scrollTo(0, 0);
-  };
-
-  const nextChapter = () => {
-    if (currentChapterIndex < bookData.length - 1) {
-      goToChapter(currentChapterIndex + 1);
-    }
-  };
-
-  const prevChapter = () => {
-    if (currentChapterIndex > 0) {
-      goToChapter(currentChapterIndex - 1);
-    } else {
-      setCurrentView('toc');
-    }
-  };
-
-  const handleSaveImageUrl = () => {
-    setAppData(prev => prev.map(ch => {
-      if (ch.id === editModal.chapterId) {
-        if (editModal.type === 'cover') {
-          return { ...ch, image: editModal.tempUrl };
-        } else if (editModal.type === 'gallery') {
-          const newGallery = [...ch.culture.gallery];
-          newGallery[editModal.index] = editModal.tempUrl;
-          return { ...ch, culture: { ...ch.culture, gallery: newGallery } };
+        /* Print specifics */
+        @media print {
+            body { background: white !important; color: black !important; }
+            .print\:hidden { display: none !important; }
+            .page-break-after-always { page-break-after: always !important; }
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
         }
-      }
-      return ch;
-    }));
-    setEditModal({ isOpen: false, chapterId: null, type: '', index: 0, currentUrl: '', tempUrl: '' });
-    setPreviewError(false);
-  };
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased">
+    <div id="root"></div>
 
-  // Helper para asignar color según nivel de vocabulario
-  const getLevelColor = (level) => {
-    if(level.includes('Inicial')) return 'bg-green-100 text-green-800 border-green-200';
-    if(level.includes('Intermedio')) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    return 'bg-purple-100 text-purple-800 border-purple-200';
-  };
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-  // --- RENDER PRINTABLE VERSION (OFFLINE/HANDWRITING MODE) ---
-  if (currentView === 'print') {
-    return (
-      <div className="bg-white text-black min-h-screen font-serif pb-20">
-        <div className="max-w-4xl mx-auto p-8">
-          
-          <div className="text-center mb-10 pb-6 border-b-4 border-slate-900 print:hidden bg-slate-50 p-6 rounded-xl">
-             <Printer size={48} className="mx-auto mb-4 text-slate-700" />
-             <h2 className="text-3xl font-bold mb-4 font-sans text-slate-800">Modo Cuaderno de Trabajo</h2>
-             <p className="mb-6 font-sans text-slate-600 max-w-2xl mx-auto">
-               Utiliza la opción de impresión de tu navegador para guardar este documento como PDF o imprimirlo en papel.
-             </p>
-             <div className="flex justify-center gap-4">
-               <button 
-                 onClick={() => window.print()} 
-                 className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-lg font-bold shadow-lg transition"
-               >
-                 Imprimir Documento
-               </button>
-               <button 
-                 onClick={() => setCurrentView('cover')} 
-                 className="bg-white border-2 border-slate-300 text-slate-700 hover:bg-slate-100 px-8 py-3 rounded-lg font-bold transition"
-               >
-                 Volver al Libro
-               </button>
-             </div>
-          </div>
+        // SVG equivalents of the lucide-react icons used in the app
+        const Icon = ({ children, size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                {children}
+            </svg>
+        );
 
-          <div className="print-content">
-            <div className="text-center mb-16 pt-8">
-              <h1 className="text-5xl font-extrabold mb-4 uppercase tracking-widest">Fiestas que cuentan historias</h1>
-              <p className="text-2xl italic text-slate-700 mb-2">Un viaje cultural por el mundo hispanohablante</p>
-              <p className="text-xl font-bold border-t-2 border-b-2 border-black inline-block py-2 px-6 mt-4">Cuaderno de Comprensión y Reflexión (IB)</p>
-              <div className="mt-16 flex flex-col items-start w-1/2 mx-auto gap-4">
-                <div className="w-full flex border-b-2 border-black pb-1"><span className="font-bold mr-4">Nombre:</span> </div>
-                <div className="w-full flex border-b-2 border-black pb-1"><span className="font-bold mr-4">Fecha:</span> </div>
-              </div>
-            </div>
+        const BookOpen = (p) => <Icon {...p}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></Icon>;
+        const MapPin = (p) => <Icon {...p}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></Icon>;
+        const Calendar = (p) => <Icon {...p}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></Icon>;
+        const Info = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></Icon>;
+        const Edit3 = (p) => <Icon {...p}><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></Icon>;
+        const ArrowRight = (p) => <Icon {...p}><line x1="5" x2="19" y1="12" y2="12"/><polyline points="12 5 19 12 12 19"/></Icon>;
+        const ArrowLeft = (p) => <Icon {...p}><line x1="19" x2="5" y1="12" y2="12"/><polyline points="12 19 5 12 12 5"/></Icon>;
+        const List = (p) => <Icon {...p}><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></Icon>;
+        const Globe = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></Icon>;
+        const ChevronRight = (p) => <Icon {...p}><polyline points="9 18 15 12 9 6"/></Icon>;
+        const CheckCircle2 = (p) => <Icon {...p}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></Icon>;
+        const Printer = (p) => <Icon {...p}><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></Icon>;
+        const ExternalLink = (p) => <Icon {...p}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></Icon>;
+        const PlayCircle = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></Icon>;
+        const TrendingUp = (p) => <Icon {...p}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></Icon>;
+        const Camera = (p) => <Icon {...p}><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></Icon>;
+        const ImageIcon = (p) => <Icon {...p}><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></Icon>;
+        function App() {
+          const [appData, setAppData] = useState(initialBookData);
+          const [isEditMode, setIsEditMode] = useState(false);
+          const [editModal, setEditModal] = useState({ isOpen: false, chapterId: null, type: '', index: 0, currentUrl: '', tempUrl: '' });
+          const [previewError, setPreviewError] = useState(false);
+          const [currentView, setCurrentView] = useState('cover'); // 'cover', 'toc', 'chapter', 'print'
+          const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
+          const [activeTab, setActiveTab] = useState('story'); // 'story', 'culture', 'activities'
+         
+          // State to store student answers
+          const [studentAnswers, setStudentAnswers] = useState({});
 
-            {appData.map((chapter, index) => (
-               <div key={chapter.id} className="mb-24 page-break-after-always" style={{ pageBreakAfter: 'always' }}>
-                  
-                  <div className="border-l-8 border-slate-800 pl-6 mb-8">
-                    <h2 className="text-4xl font-black uppercase">
-                      {index + 1}. {chapter.title}
-                    </h2>
-                    <h3 className="text-2xl text-slate-600 italic mt-2 flex items-center gap-2">
-                       {chapter.country} • {chapter.vocabLevel}
-                    </h3>
-                  </div>
-                  
-                  <h4 className="text-2xl font-bold mb-4 font-sans bg-slate-100 p-2 inline-block">Lectura: "{chapter.storyTitle}"</h4>
-                  <div className="text-justify leading-loose text-lg mb-8 space-y-4 pr-4">
-                    {chapter.story.map((p, i) => (
-                      <p key={i} className={p.startsWith('—') ? 'pl-8 italic' : ''}>{p}</p>
-                    ))}
-                  </div>
+          const handleAnswerChange = (chapterId, questionIndex, value) => {
+            setStudentAnswers(prev => ({
+              ...prev,
+              [chapterId]: {
+                ...(prev[chapterId] || {}),
+                [questionIndex]: value
+              }
+            }));
+          };
 
-                  <h4 className="text-xl font-bold mb-4 border-b-2 border-slate-300 pb-2">Vocabulario Bilingüe Escalonado</h4>
-                  <div className="grid grid-cols-2 gap-x-8 gap-y-3 mb-10 text-lg bg-slate-50 p-6 border border-slate-200">
-                    {chapter.keywords.map((kw, i) => (
-                      <div key={i} className="flex border-b border-slate-300 border-dotted pb-1">
-                        <span className="font-bold w-1/2">{kw.word}</span>
-                        <span className="italic text-slate-600 w-1/2">{kw.translation}</span>
-                      </div>
-                    ))}
-                  </div>
+          const goToChapter = (index) => {
+            setCurrentChapterIndex(index);
+            setActiveTab('story');
+            setCurrentView('chapter');
+            window.scrollTo(0, 0);
+          };
 
-                  <h4 className="text-2xl font-bold mb-6 font-sans bg-slate-100 p-2 inline-block">Actividades de Reflexión (IB)</h4>
-                  <div className="space-y-12">
-                     {chapter.activities.map((act, i) => (
-                        <div key={i} className="mb-12">
-                          <p className="font-bold text-lg mb-6 leading-relaxed">{i + 1}. {act}</p>
-                          <div className="border-b-2 border-slate-400 mt-10"></div>
-                          <div className="border-b-2 border-slate-400 mt-10"></div>
-                          <div className="border-b-2 border-slate-400 mt-10"></div>
-                          <div className="border-b-2 border-slate-400 mt-10"></div>
-                        </div>
-                     ))}
-                  </div>
-               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
+          const nextChapter = () => {
+            if (currentChapterIndex < appData.length - 1) {
+              goToChapter(currentChapterIndex + 1);
+            }
+          };
 
-  // --- RENDER COVER ---
-  if (currentView === 'cover') {
-    return (
-      <div className="min-h-screen bg-orange-50 flex items-center justify-center p-4 font-sans text-slate-800">
-        <div className="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-orange-100">
-          <div className="md:w-1/2 p-10 md:p-16 flex flex-col justify-center">
-            <div className="inline-block bg-orange-100 text-orange-800 font-bold px-4 py-1 rounded-full text-xs tracking-widest uppercase mb-6 self-start">
-              Programa del Diploma IB • Progresión de Vocabulario
-            </div>
-            <h1 className="text-5xl md:text-6xl font-extrabold mb-6 leading-tight text-slate-900">
-              Fiestas que<br/><span className="text-orange-600">cuentan historias</span>
-            </h1>
-            <p className="text-lg text-slate-600 mb-10 leading-relaxed">
-              Descubre la riqueza de nuestras tradiciones. Las lecturas están diseñadas con <span className="font-bold text-orange-800">andamiaje lingüístico</span>: comienzan con vocabulario sencillo y aumentan gradualmente su complejidad.
-            </p>
-            <div className="flex flex-col xl:flex-row gap-4">
-              <button 
-                onClick={() => setCurrentView('toc')}
-                className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 px-8 rounded-xl transition duration-300 flex items-center justify-center w-full shadow-lg shadow-orange-200"
-              >
-                Comenzar Lectura <BookOpen size={20} className="ml-2" />
-              </button>
-              <button 
-                onClick={() => setCurrentView('print')}
-                className="bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-4 px-8 rounded-xl transition duration-300 flex items-center justify-center w-full"
-              >
-                Modo Cuaderno <Printer size={20} className="ml-2" />
-              </button>
-            </div>
-          </div>
-          <div className="md:w-1/2 relative bg-orange-200 min-h-[300px] md:min-h-full">
-             <img 
-               src="https://images.unsplash.com/photo-1518306069926-f76db3163158?auto=format&fit=crop&w=1000&q=80" 
-               alt="Papel picado y festividad" 
-               className="absolute inset-0 w-full h-full object-cover"
-             />
-             <div className="absolute inset-0 bg-gradient-to-r from-white via-white/10 to-transparent"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+          const prevChapter = () => {
+            if (currentChapterIndex > 0) {
+              goToChapter(currentChapterIndex - 1);
+            } else {
+              setCurrentView('toc');
+            }
+          };
 
-  // --- RENDER TABLE OF CONTENTS ---
-  if (currentView === 'toc') {
-    return (
-      <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 font-sans">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-            <h1 className="text-3xl font-bold text-slate-900">Índice de Celebraciones</h1>
-            <div className="flex gap-4">
-               <button 
-                 onClick={() => setCurrentView('print')}
-                 className="text-slate-600 hover:text-orange-700 font-bold flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm"
-               >
-                 <Printer size={18} /> Imprimir Todo
-               </button>
-               <button 
-                 onClick={() => setCurrentView('cover')}
-                 className="text-orange-600 hover:text-orange-800 font-medium flex items-center gap-2"
-               >
-                 <ArrowLeft size={20} /> Volver
-               </button>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
-            <div className="p-8">
-              <p className="text-slate-600 mb-8 text-lg">
-                Selecciona un capítulo. Observa la etiqueta de nivel (Inicial, Intermedio, Avanzado) para conocer la complejidad del vocabulario y gramática utilizada en el relato.
-              </p>
-              
-              <div className="grid md:grid-cols-2 gap-4">
-                {appData.map((chapter, idx) => (
-                  <button
-                    key={chapter.id}
-                    onClick={() => goToChapter(idx)}
-                    className="flex items-center text-left p-4 rounded-xl border border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition duration-200 group shadow-sm hover:shadow-md relative overflow-hidden"
-                  >
-                    <div className="bg-slate-100 text-slate-600 font-black text-xl h-12 w-12 rounded-xl flex items-center justify-center shrink-0 mr-4 group-hover:bg-orange-600 group-hover:text-white transition">
-                      {idx + 1}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold text-slate-800 text-lg group-hover:text-orange-700 leading-tight mb-1">{chapter.title}</h3>
-                      <div className="flex flex-wrap items-center gap-2 mt-1">
-                        <span className="text-sm text-slate-500 flex items-center gap-1 font-medium">
-                          <MapPin size={14} className="text-orange-400" /> {chapter.country}
-                        </span>
-                        <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-md border ${getLevelColor(chapter.vocabLevel)}`}>
-                          {chapter.vocabLevel}
-                        </span>
+          const handleSaveImageUrl = () => {
+            setAppData(prev => prev.map(ch => {
+              if (ch.id === editModal.chapterId) {
+                if (editModal.type === 'cover') {
+                  return { ...ch, image: editModal.tempUrl };
+                } else if (editModal.type === 'gallery') {
+                  const newGallery = [...ch.culture.gallery];
+                  newGallery[editModal.index] = editModal.tempUrl;
+                  return { ...ch, culture: { ...ch.culture, gallery: newGallery } };
+                }
+              }
+              return ch;
+            }));
+            setEditModal({ isOpen: false, chapterId: null, type: '', index: 0, currentUrl: '', tempUrl: '' });
+            setPreviewError(false);
+          };
+
+          // Helper para asignar color según nivel de vocabulario
+          const getLevelColor = (level) => {
+            if(level.includes('Inicial')) return 'bg-green-100 text-green-800 border-green-200';
+            if(level.includes('Intermedio')) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            return 'bg-purple-100 text-purple-800 border-purple-200';
+          };
+                      <h1 className="text-5xl font-extrabold mb-4 uppercase tracking-widest font-sans">Fiestas que cuentan historias</h1>
+                      <p className="text-2xl italic text-slate-700 mb-2">Un viaje cultural por el mundo hispanohablante</p>
+                      <p className="text-xl font-bold border-t-2 border-b-2 border-black inline-block py-2 px-6 mt-4 font-sans">Cuaderno de Comprensión y Reflexión (IB)</p>
+                      <div className="mt-16 flex flex-col items-start w-1/2 mx-auto gap-4 font-sans">
+                        <div className="w-full flex border-b-2 border-black pb-1"><span className="font-bold mr-4">Nombre:</span> </div>
+                        <div className="w-full flex border-b-2 border-black pb-1"><span className="font-bold mr-4">Fecha:</span> </div>
                       </div>
                     </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
-  // --- RENDER CHAPTER ---
-  const chapter = appData[currentChapterIndex];
+                    {appData.map((chapter, index) => (
+                       <div key={chapter.id} className="mb-24 page-break-after-always">
+                         
+                          <div className="border-l-8 border-slate-800 pl-6 mb-8">
+                            <h2 className="text-4xl font-black uppercase font-sans">
+                              {index + 1}. {chapter.title}
+                            </h2>
+                            <h3 className="text-2xl text-slate-600 italic mt-2 flex items-center gap-2">
+                               {chapter.country} • {chapter.vocabLevel}
+                            </h3>
+                          </div>
+                         
+                          <h4 className="text-2xl font-bold mb-4 font-sans bg-slate-100 p-2 inline-block">Lectura: "{chapter.storyTitle}"</h4>
+                          <div className="text-justify leading-loose text-lg mb-8 space-y-4 pr-4">
+                            {chapter.story.map((p, i) => (
+                              <p key={i} className={p.startsWith('—') ? 'pl-8 italic' : ''}>{p}</p>
+                            ))}
+                          </div>
 
-  return (
-    <div className="min-h-screen bg-slate-50 pb-20 font-sans text-slate-800 relative">
-      
-      {/* Top Navigation Bar */}
-      <div className="bg-white sticky top-0 z-50 border-b border-slate-200 shadow-sm px-4 py-3 flex justify-between items-center">
-        <button 
-          onClick={() => setCurrentView('toc')}
-          className="text-slate-500 hover:text-orange-600 font-medium flex items-center gap-2 transition bg-slate-50 px-3 py-1.5 rounded-lg"
-        >
-          <List size={20} /> <span className="hidden sm:inline">Índice</span>
-        </button>
-        <div className="text-center flex flex-col items-center">
-          <span className="text-xs font-bold uppercase tracking-wider text-orange-500">Capítulo {currentChapterIndex + 1} de {appData.length}</span>
-          <h2 className="text-sm font-bold text-slate-800 hidden sm:block">{chapter.title}</h2>
-        </div>
-        <div className="flex gap-2 items-center">
-          <button
-            onClick={() => setIsEditMode(!isEditMode)}
-            className={`p-2 rounded-lg transition border flex items-center gap-1 ${isEditMode ? 'bg-orange-600 text-white border-orange-600' : 'text-slate-500 border-transparent hover:border-slate-200 hover:bg-slate-100'}`}
-            title="Editar Imágenes"
-          >
-            <Camera size={18} />
-            <span className="hidden lg:inline text-sm font-bold">{isEditMode ? 'Edición ON' : 'Editar Imágenes'}</span>
-          </button>
-          <div className="w-px h-6 bg-slate-200 mx-1 hidden sm:block"></div>
-          <button 
-            onClick={prevChapter}
-            className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition border border-transparent hover:border-slate-200"
-            title="Capítulo Anterior"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <button 
-            onClick={nextChapter}
-            disabled={currentChapterIndex === appData.length - 1}
-            className={`p-2 rounded-lg transition border ${currentChapterIndex === appData.length - 1 ? 'text-slate-300 border-transparent cursor-not-allowed' : 'text-orange-600 border-orange-200 hover:bg-orange-50'}`}
-            title="Siguiente Capítulo"
-          >
-            <ArrowRight size={20} />
-          </button>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 mt-8 flex flex-col xl:flex-row gap-8">
-        
-        {/* Left Column: Image & Vocab */}
-        <div className="xl:w-1/3 flex flex-col gap-6">
-          {/* Main Hero Image */}
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-100">
-            <div className="relative h-64 xl:h-80 group">
-              <img 
-                src={chapter.image} 
-                alt={chapter.title}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6">
-                <div className="flex items-center text-orange-400 font-bold mb-2 gap-2 text-sm tracking-wide uppercase">
-                  <span className="flex items-center gap-1"><MapPin size={16} /> {chapter.country}</span>
-                  <span className="opacity-50">•</span>
-                  <span className={`px-2 py-0.5 rounded text-[10px] ${getLevelColor(chapter.vocabLevel)}`}>{chapter.vocabLevel}</span>
-                </div>
-                <h1 className="text-3xl font-extrabold text-white leading-tight">
-                  {chapter.title}
-                </h1>
-              </div>
-              {isEditMode && (
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                  <button 
-                    onClick={() => setEditModal({ isOpen: true, chapterId: chapter.id, type: 'cover', index: 0, currentUrl: chapter.image, tempUrl: chapter.image })}
-                    className="bg-orange-600 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 shadow-lg hover:bg-orange-700 transition"
-                  >
-                    <ImageIcon size={18} /> Cambiar Portada
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Interactive Vocabulary Widget */}
-          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 sticky top-24">
-              <h4 className="text-sm font-black uppercase text-slate-800 mb-4 tracking-widest flex items-center justify-between border-b border-slate-100 pb-2">
-                <span className="flex items-center gap-2"><TrendingUp size={16} className="text-orange-500" /> Glosario Escalonado</span>
-                <Globe size={16} className="text-slate-400"/>
-              </h4>
-              <p className="text-xs text-slate-500 mb-4 italic">Pasa el ratón (hover) sobre cada palabra para ver su traducción al inglés.</p>
-              <div className="flex flex-col gap-3">
-                {chapter.keywords.map((kw, idx) => (
-                  <div key={idx} className="group relative bg-orange-50 border border-orange-200 rounded-lg p-3 hover:bg-orange-600 transition-colors duration-300 cursor-default flex flex-col">
-                    <span className="text-orange-800 font-bold group-hover:text-white transition-colors">{kw.word}</span>
-                    <span className="text-orange-600 text-sm italic mt-1 group-hover:text-orange-100 transition-colors">{kw.translation}</span>
-                  </div>
-                ))}
-              </div>
-          </div>
-        </div>
-
-        {/* Right Column: Interactive Content */}
-        <div className="xl:w-2/3">
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-100 min-h-[800px] flex flex-col">
-            
-            {/* Navigation Tabs */}
-            <div className="flex border-b border-slate-200 bg-slate-50">
-              <button 
-                onClick={() => setActiveTab('story')}
-                className={`flex-1 py-5 px-2 text-center font-bold flex flex-col sm:flex-row items-center justify-center gap-2 transition-colors ${activeTab === 'story' ? 'text-orange-700 bg-white border-t-4 border-t-orange-500' : 'text-slate-500 hover:text-slate-800'}`}
-              >
-                <BookOpen size={20} /> <span>El Relato</span>
-              </button>
-              <button 
-                onClick={() => setActiveTab('culture')}
-                className={`flex-1 py-5 px-2 text-center font-bold flex flex-col sm:flex-row items-center justify-center gap-2 transition-colors ${activeTab === 'culture' ? 'text-blue-700 bg-white border-t-4 border-t-blue-500' : 'text-slate-500 hover:text-slate-800'}`}
-              >
-                <Globe size={20} /> <span>Contexto Visual</span>
-              </button>
-              <button 
-                onClick={() => setActiveTab('activities')}
-                className={`flex-1 py-5 px-2 text-center font-bold flex flex-col sm:flex-row items-center justify-center gap-2 transition-colors ${activeTab === 'activities' ? 'text-emerald-700 bg-white border-t-4 border-t-emerald-500' : 'text-slate-500 hover:text-slate-800'}`}
-              >
-                <Edit3 size={20} /> <span>Análisis / Diario</span>
-              </button>
-            </div>
-
-            {/* Content Area */}
-            <div className="p-8 sm:p-12 flex-grow bg-white">
-              
-              {/* STORY TAB */}
-              {activeTab === 'story' && (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <h2 className="text-3xl font-black text-slate-800 mb-8 font-serif">“{chapter.storyTitle}”</h2>
-                  <div className="space-y-6 text-lg text-slate-700 leading-relaxed font-serif">
-                    {chapter.story.map((paragraph, idx) => (
-                      <p key={idx} className={paragraph.startsWith('—') ? 'pl-6 border-l-4 border-orange-300 italic text-slate-600 bg-orange-50/30 py-2' : ''}>
-                        {paragraph}
-                      </p>
-                    ))}
-                  </div>
-                  
-                  <div className="mt-16 flex justify-end">
-                    <button 
-                      onClick={() => setActiveTab('culture')}
-                      className="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-3 hover:bg-slate-800 transition shadow-md"
-                    >
-                      Ver Galería de Imágenes <ArrowRight size={18} />
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* CULTURE TAB (Enhanced with Media) */}
-              {activeTab === 'culture' && (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  
-                  {/* Visual Gallery (Highly contextual images) */}
-                  <div className="mb-10">
-                    <h3 className="font-bold text-xl text-slate-800 mb-4 border-b-2 border-slate-100 pb-2 flex items-center gap-2">
-                       Fotografías de la Celebración
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                       {chapter.culture.gallery.map((imgUrl, i) => (
-                         <div key={i} className="group relative h-56 rounded-xl overflow-hidden shadow-md border border-slate-200">
-                            <img src={imgUrl} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt={`Contexto visual de ${chapter.title}`}/>
-                            {isEditMode && (
-                              <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                                <button 
-                                  onClick={() => setEditModal({ isOpen: true, chapterId: chapter.id, type: 'gallery', index: i, currentUrl: imgUrl, tempUrl: imgUrl })}
-                                  className="bg-orange-600 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 shadow-lg hover:bg-orange-700 transition"
-                                >
-                                  <ImageIcon size={18} /> Cambiar Foto {i + 1}
-                                </button>
+                          <h4 className="text-xl font-bold mb-4 border-b-2 border-slate-300 pb-2 font-sans">Vocabulario Bilingüe Escalonado</h4>
+                          <div className="grid grid-cols-2 gap-x-8 gap-y-3 mb-10 text-lg bg-slate-50 p-6 border border-slate-200">
+                            {chapter.keywords.map((kw, i) => (
+                              <div key={i} className="flex border-b border-slate-300 border-dotted pb-1 font-sans">
+                                <span className="font-bold w-1/2">{kw.word}</span>
+                                <span className="italic text-slate-600 w-1/2">{kw.translation}</span>
                               </div>
-                            )}
-                         </div>
-                       ))}
-                    </div>
-                  </div>
+                            ))}
+                          </div>
 
-                  {/* Facts Grid */}
-                  <div className="grid sm:grid-cols-2 gap-6 mb-10">
-                    <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
-                      <div className="flex items-center gap-3 text-blue-800 mb-3 font-black uppercase text-sm tracking-wider">
-                        <Calendar size={18} className="text-blue-500"/> Fecha
-                      </div>
-                      <p className="text-slate-700 font-medium">{chapter.culture.date}</p>
-                    </div>
-                    <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
-                      <div className="flex items-center gap-3 text-blue-800 mb-3 font-black uppercase text-sm tracking-wider">
-                        <MapPin size={18} className="text-blue-500"/> Origen
-                      </div>
-                      <p className="text-slate-700 font-medium">{chapter.culture.origin}</p>
-                    </div>
-                  </div>
-
-                  <div className="mb-10">
-                    <h3 className="font-bold text-xl text-slate-800 mb-4 border-b-2 border-slate-100 pb-2">Elementos Clave</h3>
-                    <ul className="grid sm:grid-cols-2 gap-4">
-                      {chapter.culture.elements.map((el, idx) => (
-                        <li key={idx} className="flex items-start gap-3 text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
-                          <CheckCircle2 size={20} className="text-blue-500 shrink-0 mt-0.5" />
-                          <span className="font-medium">{el}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 text-white shadow-xl mb-10 relative overflow-hidden">
-                    <Info className="absolute -right-4 -top-4 text-slate-700 opacity-50" size={120} />
-                    <h3 className="font-black text-xl mb-3 text-blue-300 relative z-10">Significado Cultural</h3>
-                    <p className="text-lg leading-relaxed relative z-10">{chapter.culture.meaning}</p>
-                  </div>
-
-                  {/* Recommended Videos */}
-                  <div className="mb-10">
-                    <h3 className="font-bold text-xl text-slate-800 mb-4 border-b-2 border-slate-100 pb-2 flex items-center gap-2">
-                       Videos Documentales (YouTube)
-                    </h3>
-                    <div className="flex flex-col gap-3">
-                       {chapter.culture.videos.map((vid, i) => (
-                         <a key={i} href={vid.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl transition-colors group">
-                           <div className="flex items-center gap-3">
-                             <PlayCircle className="text-red-600 group-hover:scale-110 transition-transform" size={24} />
-                             <span className="font-bold text-red-900">{vid.title}</span>
-                           </div>
-                           <ExternalLink className="text-red-400 group-hover:text-red-600" size={18}/>
-                         </a>
-                       ))}
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-between border-t border-slate-200 pt-6">
-                    <button 
-                      onClick={() => setActiveTab('story')}
-                      className="text-slate-500 font-bold flex items-center gap-2 hover:text-slate-800 transition"
-                    >
-                      <ArrowLeft size={18} /> Relato
-                    </button>
-                    <button 
-                      onClick={() => setActiveTab('activities')}
-                      className="bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-3 hover:bg-emerald-700 transition shadow-md"
-                    >
-                      Ir al Diario <ArrowRight size={18} />
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* ACTIVITIES TAB */}
-              {activeTab === 'activities' && (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <div className="flex justify-between items-start mb-8">
-                     <div>
-                       <h2 className="text-3xl font-black text-slate-800 mb-2 flex items-center gap-3">
-                         <Edit3 className="text-emerald-500" size={32} /> Análisis y Reflexión
-                       </h2>
-                       <p className="text-slate-500">Puedes escribir tus respuestas aquí o usar el Modo Cuaderno para escribir a mano.</p>
-                     </div>
-                  </div>
-
-                  <div className="space-y-8">
-                    {chapter.activities.map((question, idx) => (
-                      <div key={idx} className="bg-emerald-50/50 p-6 sm:p-8 rounded-2xl border border-emerald-100 shadow-sm">
-                        <label className="block text-slate-800 font-bold mb-4 text-lg">
-                          <span className="bg-emerald-200 text-emerald-800 w-8 h-8 inline-flex items-center justify-center rounded-full mr-3 text-sm">{idx + 1}</span>
-                          {question}
-                        </label>
-                        <textarea
-                          className="w-full bg-white border-2 border-emerald-100 rounded-xl p-5 text-slate-700 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition resize-y min-h-[120px] text-lg leading-relaxed shadow-inner"
-                          placeholder="Escribe tu análisis aquí..."
-                          value={studentAnswers[chapter.id]?.[idx] || ""}
-                          onChange={(e) => handleAnswerChange(chapter.id, idx, e.target.value)}
-                        />
-                      </div>
+                          <h4 className="text-2xl font-bold mb-6 font-sans bg-slate-100 p-2 inline-block">Actividades de Reflexión (IB)</h4>
+                          <div className="space-y-12">
+                             {chapter.activities.map((act, i) => (
+                                <div key={i} className="mb-12 font-sans">
+                                  <p className="font-bold text-lg mb-6 leading-relaxed">{i + 1}. {act}</p>
+                                  <div className="border-b-2 border-slate-400 mt-10"></div>
+                                  <div className="border-b-2 border-slate-400 mt-10"></div>
+                                  <div className="border-b-2 border-slate-400 mt-10"></div>
+                                  <div className="border-b-2 border-slate-400 mt-10"></div>
+                                </div>
+                             ))}
+                          </div>
+                       </div>
                     ))}
                   </div>
-
-                  <div className="mt-12 flex flex-col sm:flex-row justify-between items-center bg-slate-900 rounded-2xl p-6 shadow-xl">
-                     <span className="text-sm text-slate-400 italic mb-4 sm:mb-0">Nota: Respuestas guardadas en tu navegador.</span>
-                     
-                     {currentChapterIndex < appData.length - 1 ? (
-                       <button 
-                          onClick={nextChapter}
-                          className="bg-white hover:bg-slate-100 text-slate-900 font-black py-3 px-8 rounded-xl transition duration-300 flex items-center gap-3"
-                        >
-                          Siguiente Capítulo <ChevronRight size={20} />
-                        </button>
-                     ) : (
-                        <button 
-                          onClick={() => setCurrentView('toc')}
-                          className="bg-emerald-500 hover:bg-emerald-400 text-white font-black py-3 px-8 rounded-xl transition duration-300 flex items-center gap-3"
-                        >
-                          Finalizar Lecturas <CheckCircle2 size={20} />
-                        </button>
-                     )}
-                  </div>
                 </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Edit Image Modal */}
-      {editModal.isOpen && (
-        <div className="fixed inset-0 bg-slate-900/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-200">
-            <h3 className="text-2xl font-black mb-2 text-slate-800 flex items-center gap-2">
-              <Camera className="text-orange-600" />
-              Cambiar Imagen
-            </h3>
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
-              <p className="text-sm text-orange-800 font-medium mb-1">
-                <strong>Importante:</strong> Debe ser un enlace directo a la imagen.
-              </p>
-              <p className="text-xs text-orange-700">
-                Haz clic derecho sobre cualquier foto en internet y elige <strong>"Copiar dirección de la imagen"</strong>. El enlace suele terminar en <code>.jpg</code> o <code>.png</code>.
-              </p>
-            </div>
-
-            {/* PRESET EXAMPLES TO HELP THE USER */}
-            <div className="mb-4">
-               <p className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Prueba con estos ejemplos listos para usar:</p>
-               <div className="flex gap-2">
-                  <button 
-                    onClick={() => {
-                      setEditModal({...editModal, tempUrl: 'https://images.unsplash.com/photo-1518306069926-f76db3163158?auto=format&fit=crop&w=800&q=80'}); 
-                      setPreviewError(false);
-                    }} 
-                    className="text-xs bg-orange-100 hover:bg-orange-200 text-orange-800 px-3 py-2 rounded-lg font-bold transition"
-                  >
-                    Cargar Ejemplo 1
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setEditModal({...editModal, tempUrl: 'https://images.unsplash.com/photo-1531259275498-e7e0e74f00ee?auto=format&fit=crop&w=800&q=80'}); 
-                      setPreviewError(false);
-                    }} 
-                    className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-2 rounded-lg font-bold transition"
-                  >
-                    Cargar Ejemplo 2
-                  </button>
-               </div>
-            </div>
-            
-            <div className="mb-4">
-              <label className="block text-sm font-bold text-slate-700 mb-2">URL de la Imagen:</label>
-              <input
-                type="text"
-                className={`w-full border-2 rounded-xl p-4 outline-none transition text-slate-700 font-medium ${previewError ? 'border-red-400 focus:ring-4 focus:ring-red-500/20' : 'border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20'}`}
-                value={editModal.tempUrl}
-                onChange={(e) => {
-                  setEditModal({...editModal, tempUrl: e.target.value});
-                  setPreviewError(false);
-                }}
-                placeholder="https://ejemplo.com/imagen.jpg"
-                autoFocus
-              />
-            </div>
-            
-            <div className="mb-6 h-48 rounded-xl border-2 border-dashed border-slate-300 overflow-hidden relative bg-slate-50 flex items-center justify-center">
-               {editModal.tempUrl ? (
-                 <>
-                   <img 
-                      src={editModal.tempUrl} 
-                      alt="Vista previa" 
-                      className={`absolute inset-0 w-full h-full object-cover shadow-inner ${previewError ? 'hidden' : 'block'}`}
-                      onError={() => setPreviewError(true)}
-                      onLoad={() => setPreviewError(false)}
-                   />
-                   {previewError ? (
-                     <div className="text-center p-4">
-                       <span className="text-red-500 font-bold block mb-1">⚠️ Enlace no válido</span>
-                       <span className="text-xs text-slate-500">La imagen no se puede cargar. Asegúrate de copiar la 'dirección de la imagen'.</span>
-                     </div>
-                   ) : (
-                     <span className="bg-white/80 px-3 py-1 rounded-md text-slate-800 font-bold z-10 pointer-events-none shadow-sm backdrop-blur-sm">Vista Previa</span>
-                   )}
-                 </>
-               ) : (
-                 <span className="text-slate-400 font-medium">Pega un enlace para ver la imagen</span>
-               )}
-            </div>
-
-            <div className="flex justify-end gap-3 mt-4">
-              <button
-                onClick={() => {
-                  setEditModal({ isOpen: false, chapterId: null, type: '', index: 0, currentUrl: '', tempUrl: '' });
-                  setPreviewError(false);
-                }}
-                className="px-6 py-3 text-slate-600 font-bold hover:bg-slate-100 rounded-xl transition"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleSaveImageUrl}
-                disabled={previewError || !editModal.tempUrl}
-                className={`px-6 py-3 font-black rounded-xl transition shadow-lg ${previewError || !editModal.tempUrl ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none' : 'bg-orange-600 text-white hover:bg-orange-700 shadow-orange-200'}`}
-              >
-                Guardar Imagen
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+              </div>
+            );
+          }
